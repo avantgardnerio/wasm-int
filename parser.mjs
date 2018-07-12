@@ -14,6 +14,23 @@ const readVarUint = (dataView, offset) => {
     return [val, count];
 }
 
+const readVarInt = (dataView, offset) => {
+    let [val, count, byte, mask] = [0, 0, 0, 0];
+    do {
+        byte = dataView.getUint8(offset + count);
+        const lastByte = !(byte & 0x80);
+        const negative = lastByte && !!(byte & 0x40);
+        const significant = lastByte ? 0x3F : 0x7F;
+        mask |= (0xFF & significant) << (count * 7); 
+        val |= (byte & significant) << (count * 7);
+        if(negative) {
+            val = (((val ^ mask) & mask) + 1) * -1;
+        }
+        count++;
+    } while(byte & 0x80);
+    return [val, count];
+}
+
 const sectionTypes = {
     "0": "Custom",
     "1": "Type", // Function signature declarations
@@ -29,6 +46,53 @@ const sectionTypes = {
     "11": "Data" // Data segments
 }
 
+const typeConstructors = {
+    "-1": "i32", // -0x01 (i.e., the byte 0x7f)	i32
+    "-2": "i64", // -0x02 (i.e., the byte 0x7e)	i64
+    "-3": "f32", // -0x03 (i.e., the byte 0x7d)	f32
+    "-4": "f64", // -0x04 (i.e., the byte 0x7c)	f64
+    "-16": "anyfunc", // -0x10 (i.e., the byte 0x70)	anyfunc
+    "-32": "func", // -0x20 (i.e., the byte 0x60)	func
+    "-64": "block_type" // -0x40 (i.e., the byte 0x40)	pseudo type for representing an empty block_type
+}
+
+// https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#language-types
+const readType = (dataView, offset) => {
+    const [type, len] = readVarInt(dataView, offset);
+    if(!typeConstructors[type]) {
+        throw new Error('Invalid type: ', type);
+    }
+    return [type, len];
+}
+
+// https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#func_type
+const parseFuncType = (dataView, offset) => {
+    const [form, _1] = readType(dataView, offset);
+    offset += _1;
+    const [paramCount, _2] = readVarUint(dataView, offset);
+    offset += _2;
+    const func = {
+        type: 'function',
+        returnType: typeConstructors[form],
+        parameters: []
+    };
+    for(let i = 0; i < paramCount; i++) {
+        const [paramType, _3] = readType(dataView, offset);
+        offset += _3;
+        func.parameters.push(typeConstructors[paramType]);
+    }
+    return func;
+}
+
+// https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#type-section
+const parseType = (dataView, offset) => { // Function signature declarations
+    const [count, countLen] = readVarUint(dataView, offset);
+    offset += countLen;
+    for(let i = 0; i < count; i++) {
+        parseFuncType(dataView, offset);
+    }
+}
+
 /*
     id	            varuint7	section code
     payload_len	    varuint32	size of this section in bytes
@@ -40,16 +104,21 @@ const parseSections = (dataView, offset) => {
     const sections = [];
     while(offset < dataView.byteLength) {
         const id = dataView.getUint8(offset++);
+        const type = sectionTypes[id];
         const [payloadLen, lenLen] = readVarUint(dataView, offset);
-        console.log(`section=${sectionTypes[id]} position=${offset}`);
+        console.log(`section=${type} position=${offset}`);
 
-        const section = {
-            type: sectionTypes[id],
-            position: offset
+        offset += lenLen;
+        let section;
+        switch(type) {
+            case 'Type': 
+                section = parseType(dataView, offset);
+            default:
+                throw new Error('Invalid type: ', type);
         }
         sections.push(section);
 
-        offset += lenLen + payloadLen;
+        offset += payloadLen;
     }
     return sections;
 }
