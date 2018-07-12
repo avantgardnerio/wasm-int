@@ -222,72 +222,73 @@ const parseGlobalSection = (dataView, offset) => {
     return section;
 }
 
+const parseExportEntry = (reader) => {
+    const fieldLen = reader.readVarUint();
+    const field = reader.readString(fieldLen);
+    const kindId = reader.getUint8();
+    const kind = externalKind[kindId];
+    const index = reader.readVarUint();
+    const exportEntry = {field, kind, index};
+    return exportEntry;
+}      
+
+const parseExportSection = (reader) => {
+    const count = reader.readVarUint();
+    const section = {
+        type: 'Export',
+        exports: []
+    }
+    for(let i = 0; i < count; i++) {
+        const exportEntry = parseExportEntry(reader);
+        section.exports.push(exportEntry);
+    }
+    return section;
+}        
+
+const parseSections = (reader) => {
+    const dataView = reader.dataView; // TODO: kill this
+
+    const sections = [];
+    while(reader.available) {
+        const id = reader.getUint8();
+        const type = sectionTypes[id];
+        const payloadLen = reader.readVarUint();
+        const position = reader.offset;
+        console.log(`section=${type} position=${position}`);
+
+        let section;
+        switch(type) { // TODO: map instead of switch
+            case 'Type': 
+                section = parseTypeSection(dataView, reader.offset);
+                break;
+            case 'Function':
+                section = parseFunctionSection(dataView, reader.offset);
+                break;
+            case 'Table':
+                section = parseTableSection(dataView, reader.offset);
+                break;
+            case 'Memory':
+                section = parseMemorySection(dataView, reader.offset);
+                break;
+            case 'Global':
+                section = parseGlobalSection(dataView, reader.offset);
+                break;
+            case 'Export':
+                section = parseExportSection(reader);
+                break;
+            default:
+                throw new Error('Invalid type: ' + type);
+        }
+        sections.push(section);
+
+        reader.offset = position + payloadLen;
+    }
+    return sections;
+}    
+
 const createParser = (TextDecoder) => {
     const parse = (buffer) => {
         const reader = new Reader(buffer, TextDecoder);
-        const dataView = reader.dataView; // TODO: kill this
-
-        const parseSections = (reader) => {
-            const sections = [];
-            while(reader.available) {
-                const id = reader.getUint8();
-                const type = sectionTypes[id];
-                const payloadLen = reader.readVarUint();
-                const position = reader.offset;
-                console.log(`section=${type} position=${position}`);
-        
-                let section;
-                switch(type) { // TODO: map instead of switch
-                    case 'Type': 
-                        section = parseTypeSection(dataView, reader.offset);
-                        break;
-                    case 'Function':
-                        section = parseFunctionSection(dataView, reader.offset);
-                        break;
-                    case 'Table':
-                        section = parseTableSection(dataView, reader.offset);
-                        break;
-                    case 'Memory':
-                        section = parseMemorySection(dataView, reader.offset);
-                        break;
-                    case 'Global':
-                        section = parseGlobalSection(dataView, reader.offset);
-                        break;
-                    case 'Export':
-                        section = parseExportSection(reader);
-                        break;
-                    default:
-                        throw new Error('Invalid type: ' + type);
-                }
-                sections.push(section);
-        
-                reader.offset = position + payloadLen;
-            }
-            return sections;
-        }    
-
-        const parseExportEntry = (reader) => {
-            const fieldLen = reader.readVarUint();
-            const field = reader.readString(fieldLen);
-            const kindId = reader.getUint8();
-            const kind = externalKind[kindId];
-            const index = reader.readVarUint();
-            const exportEntry = {field, kind, index};
-            return exportEntry;
-        }      
-        
-        const parseExportSection = (reader) => {
-            const count = reader.readVarUint();
-            const section = {
-                type: 'Export',
-                exports: []
-            }
-            for(let i = 0; i < count; i++) {
-                const exportEntry = parseExportEntry(reader);
-                section.exports.push(exportEntry);
-            }
-            return section;
-        }        
 
         const magicNumber = reader.getUint32();
         if(magicNumber !== 0x6d736100) {
