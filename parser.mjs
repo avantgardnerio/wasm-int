@@ -1,8 +1,3 @@
-import fs from 'fs';
-import {promisify} from 'util';
-
-const readFile = promisify(fs.readFile);
-
 /*
 For the hex impaired:
 80   40  20  10   8   4   2   1 (hex value)
@@ -41,37 +36,37 @@ const sectionTypes = {
     name	        bytes ?	section name: valid UTF-8 byte sequence, present if id == 0
     payload_data	bytes	content of this section, of length payload_len - sizeof(name) - sizeof(name_len)
 */
-const parseSection = (dataView, offset) => {
+const parseSections = (dataView, offset) => {
+    const sections = [];
     while(offset < dataView.byteLength) {
         const id = dataView.getUint8(offset++);
         const [payloadLen, lenLen] = readVarUint(dataView, offset);
         console.log(`section=${sectionTypes[id]} position=${offset}`);
 
+        const section = {
+            type: sectionTypes[id],
+            position: offset
+        }
+        sections.push(section);
+
         offset += lenLen + payloadLen;
     }
+    return sections;
 }
 
-const parseModule = (dataView) => {
+const parseWasm = (dataView) => {
     const magicNumber = dataView.getUint32(0, true);
     if(magicNumber !== 0x6d736100) {
         throw new Error('Invalid preamble!');
     }
     const version = dataView.getUint32(4, true);
     console.log('wasm version=', version);
-    const section = parseSection(dataView, 8);
+    const sections = parseSections(dataView, 8);
+    return {
+        type: 'module',
+        version: version,
+        sections
+    };
 }
 
-const main = async() => {
-    try {
-        // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#high-level-structure
-        const file = await readFile('test.wasm');
-        const dataView = new DataView(file.buffer);
-        const module = parseModule(dataView);
-
-        // sections
-    } catch(ex) {
-        console.error('Error reading wasm!', ex);
-    }
-}
-
-main();
+export default parseWasm;
