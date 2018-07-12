@@ -178,6 +178,14 @@ const parseTableSection = (dataView, offset) => {
     return table;
 }
 
+const parseMemorySection = (dataView, offset) => {
+    const [resizableLimits, _1] = parseResizableLimits(dataView, offset);
+    return {
+        type: 'Memory',
+        limits: resizableLimits
+    };
+}
+
 /*
     id	            varuint7	section code
     payload_len	    varuint32	size of this section in bytes
@@ -204,6 +212,9 @@ const parseSections = (dataView, offset) => {
                 break;
             case 'Table':
                 section = parseTableSection(dataView, offset);
+                break;
+            case 'Memory':
+                section = parseMemorySection(dataView, offset);
                 break;
             default:
                 throw new Error('Invalid type: ' + type);
