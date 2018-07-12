@@ -133,58 +133,40 @@ const parseFunctionSection = (dataView, offset) => {
     };
 }
 
-// https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#elem_type
-const parseElemType = (dataView, offset) => {
-    const [type, _1] = readType(dataView, offset);
-    if(typeConstructors[type] !== 'anyfunc') {
-        throw new Error('Illegal type: ', type);
-    }
-    return [type, _1];
-}
-
 // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#resizable_limits
-const parseResizableLimits = (dataView, original) => {
-    let offset = original;
-    const [flags, _1] = readVarUint(dataView, offset);
-    offset += _1;
-    const [initial, _2] = readVarUint(dataView, offset);
-    offset += _2;
-    const resizableLimits = {
-        initial
-    }
+const parseResizableLimits = (reader) => {
+    const flags = reader.readVarUint();
+    const initial = reader.readVarUint();
+    const resizableLimits = {initial};
     if(flags === 1) {
-        const [maximum, _3] = readVarUint(dataView, offset);
-        resizableLimits.maximum = maximum;
-        offset += _3;
+        resizableLimits.maximum = reader.readVarUint();
     }
-    return [resizableLimits, offset - original];
+    return resizableLimits;
 }
 
 // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#table_type
-const parseTableType = (dataView, offset) => {
-    const [elemType, _1] = parseElemType(dataView, offset);
-    const [resizableLimits, _2] = parseResizableLimits(dataView, offset + _1);
-    return [resizableLimits, _1 + _2];
+const parseTableType = (reader) => {
+    const type = reader.readVarInt();
+    const resizableLimits = parseResizableLimits(reader);
+    return {type, resizableLimits};
 }
 
 // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#table-section
-const parseTableSection = (dataView, offset) => {
-    const [count, countLen] = readVarUint(dataView, offset);
-    offset += countLen;
+const parseTableSection = (reader) => {
+    const count = reader.readVarUint();
     const table = {
         type: 'Table',
         limits: []
     }
     for(let i = 0; i < count; i++) {
-        const [resizableLimits, _2] = parseTableType(dataView, offset);
-        offset += _2;
-        table.limits.push(resizableLimits);
+        const tableType = parseTableType(reader);
+        table.limits.push(tableType);
     }
     return table;
 }
 
-const parseMemorySection = (dataView, offset) => {
-    const [resizableLimits, _1] = parseResizableLimits(dataView, offset);
+const parseMemorySection = (reader) => {
+    const resizableLimits = parseResizableLimits(reader);
     return {
         type: 'Memory',
         limits: resizableLimits
@@ -262,10 +244,10 @@ const parseSections = (reader) => {
                 section = parseFunctionSection(dataView, reader.offset);
                 break;
             case 'Table':
-                section = parseTableSection(dataView, reader.offset);
+                section = parseTableSection(reader);
                 break;
             case 'Memory':
-                section = parseMemorySection(dataView, reader.offset);
+                section = parseMemorySection(reader);
                 break;
             case 'Global':
                 section = parseGlobalSection(reader);
