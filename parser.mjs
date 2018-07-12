@@ -97,7 +97,7 @@ const parseFuncType = (dataView, original) => {
 }
 
 // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#type-section
-const parseType = (dataView, offset) => { // Function signature declarations
+const parseTypeSection = (dataView, offset) => { // Function signature declarations
     const [count, countLen] = readVarUint(dataView, offset);
     offset += countLen;
     const functionSignatures = [];
@@ -106,7 +106,26 @@ const parseType = (dataView, offset) => { // Function signature declarations
         offset += _1;
         functionSignatures.push(func);
     }
-    return functionSignatures;
+    return {
+        type: 'Types',
+        functionSignatures
+    };
+}
+
+// https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#function-section
+const parseFunctionSection = (dataView, offset) => {
+    const [count, countLen] = readVarUint(dataView, offset);
+    offset += countLen;
+    const functionSignatureIndices = [];
+    for(let i = 0; i < count; i++) {
+        const [sig, _1] = readVarUint(dataView, offset);
+        offset += _1;
+        functionSignatureIndices.push(sig);
+    }
+    return {
+        type: 'Function',
+        functionSignatureIndices
+    };
 }
 
 /*
@@ -128,7 +147,10 @@ const parseSections = (dataView, offset) => {
         let section;
         switch(type) { // TODO: map instead of switch
             case 'Type': 
-                section = parseType(dataView, offset);
+                section = parseTypeSection(dataView, offset);
+                break;
+            case 'Function':
+                section = parseFunctionSection(dataView, offset);
                 break;
             default:
                 throw new Error('Invalid type: ' + type);
