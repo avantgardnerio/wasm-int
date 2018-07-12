@@ -192,30 +192,27 @@ const parseMemorySection = (dataView, offset) => {
 }
 
 // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#global_type
-const parseGlobalType = (dataView, offset) => {
-    const [contentType, _1] = readType(dataView, offset);
-    const [mutability, _2] = readVarUint(dataView, offset + _1);
+const parseGlobalType = (reader) => {
+    const contentType = reader.readVarInt();
+    const mutability = reader.readVarUint();
     const globalVar = {contentType, mutable: mutability === 1};
-    return [globalVar, _1 + _2];
+    return globalVar;
 }
 
-const parseInitExpr = (dataView, offset) => {
+const parseInitExpr = (reader) => {
     throw new Error('TODO');
 }
 
 // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#global-section
-const parseGlobalSection = (dataView, offset) => {
-    const [count, countLen] = readVarUint(dataView, offset);
-    offset += countLen;
+const parseGlobalSection = (reader) => {
+    const count = reader.readVarUint();
     const section = {
         type: 'Global',
         globalVariables: []
     }
     for(let i = 0; i < count; i++) {
-        const [globalType, _2] = parseGlobalType(dataView, offset);
-        offset += _2;
-        const [initExpr, _3] = parseInitExpr(dataView, offset);
-        offset += _3;
+        const globalType = parseGlobalType(reader);
+        const initExpr = parseInitExpr(reader);
         const globalVariable = {globalType, initExpr};
         section.globalVariables.push(globalVariable);
     }
@@ -271,7 +268,7 @@ const parseSections = (reader) => {
                 section = parseMemorySection(dataView, reader.offset);
                 break;
             case 'Global':
-                section = parseGlobalSection(dataView, reader.offset);
+                section = parseGlobalSection(reader);
                 break;
             case 'Export':
                 section = parseExportSection(reader);
