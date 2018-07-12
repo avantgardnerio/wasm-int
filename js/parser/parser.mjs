@@ -1,33 +1,5 @@
 import Reader from '../stream/Reader.mjs';
 
-// TODO: kill
-const readVarUint = (dataView, offset) => {
-    let [val, count, byte] = [0, 0, 0];
-    do {
-        byte = dataView.getUint8(offset + count);
-        val |= (byte & 0x7F) << (count++ * 7);
-    } while(byte & 0x80);
-    return [val, count];
-}
-
-// TODO: kill
-const readVarInt = (dataView, offset) => {
-    let [val, count, byte, mask] = [0, 0, 0, 0];
-    do {
-        byte = dataView.getUint8(offset + count);
-        const lastByte = !(byte & 0x80);
-        const negative = lastByte && !!(byte & 0x40);
-        const significant = lastByte ? 0x3F : 0x7F;
-        mask |= (0xFF & significant) << (count * 7); 
-        val |= (byte & significant) << (count * 7);
-        if(negative) {
-            val = (((val ^ mask) & mask) + 1) * -1;
-        }
-        count++;
-    } while(byte & 0x80);
-    return [val, count];
-}
-
 const sectionTypes = {
     "0": "Custom",
     "1": "Type", // Function signature declarations
@@ -61,22 +33,10 @@ const externalKind = {
     "3": "Global"
 }
 
-// https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#language-types
-const readType = (dataView, offset) => {
-    const [type, len] = readVarInt(dataView, offset);
-    if(!typeConstructors[type]) {
-        throw new Error('Invalid type: ', type);
-    }
-    return [type, len];
-}
-
 // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#func_type
-const parseFuncType = (dataView, original) => {
-    let offset = original; // TODO: Fix this horrible pattern
-    const [form, _1] = readType(dataView, offset);
-    offset += _1;
-    const [paramCount, _2] = readVarUint(dataView, offset);
-    offset += _2;
+const parseFuncType = (reader) => {
+    const form = reader.readVarInt();
+    const paramCount = reader.readVarUint();
     const func = {
         type: 'function',
         returnType: typeConstructors[form],
@@ -84,31 +44,26 @@ const parseFuncType = (dataView, original) => {
         returnTypes: []
     };
     for(let i = 0; i < paramCount; i++) {
-        const [paramType, _3] = readType(dataView, offset);
-        offset += _3;
+        const paramType = reader.readVarInt();
         func.parameterTypes.push(typeConstructors[paramType]);
     }
-    const [returnCount, _4] = readVarUint(dataView, offset);
-    offset += _4;
+    const returnCount = reader.readVarUint();
     for(let i = 0; i < returnCount; i++) {
-        const [returnType, _5] = readType(dataView, offset);
-        offset += _5;
+        const returnType = reader.readVarInt();
         func.returnTypes.push(typeConstructors[returnType]);
     }
     const ret = returnCount === 1 ? func.returnTypes[0] : 'void';
     const p = func.parameterTypes.join(', ');
     console.log(`${ret} xxx(${p})`);
-    return [func, offset - original];
+    return func;
 }
 
 // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#type-section
-const parseTypeSection = (dataView, offset) => { // Function signature declarations
-    const [count, countLen] = readVarUint(dataView, offset);
-    offset += countLen;
+const parseTypeSection = (reader) => { // Function signature declarations
+    const count = reader.readVarUint();
     const functionSignatures = [];
     for(let i = 0; i < count; i++) {
-        const [func, _1] = parseFuncType(dataView, offset);
-        offset += _1;
+        const func = parseFuncType(reader);
         functionSignatures.push(func);
     }
     return {
@@ -118,13 +73,11 @@ const parseTypeSection = (dataView, offset) => { // Function signature declarati
 }
 
 // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#function-section
-const parseFunctionSection = (dataView, offset) => {
-    const [count, countLen] = readVarUint(dataView, offset);
-    offset += countLen;
+const parseFunctionSection = (reader) => {
+    const count = reader.readVarUint();
     const functionSignatureIndices = [];
     for(let i = 0; i < count; i++) {
-        const [sig, _1] = readVarUint(dataView, offset);
-        offset += _1;
+        const sig = reader.readVarUint();
         functionSignatureIndices.push(sig);
     }
     return {
@@ -238,10 +191,10 @@ const parseSections = (reader) => {
         let section;
         switch(type) { // TODO: map instead of switch
             case 'Type': 
-                section = parseTypeSection(dataView, reader.offset);
+                section = parseTypeSection(reader);
                 break;
             case 'Function':
-                section = parseFunctionSection(dataView, reader.offset);
+                section = parseFunctionSection(reader);
                 break;
             case 'Table':
                 section = parseTableSection(reader);
