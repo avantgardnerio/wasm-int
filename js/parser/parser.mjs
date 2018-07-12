@@ -223,9 +223,8 @@ const parseGlobalSection = (dataView, offset) => {
 }
 
 const createParser = (TextDecoder) => {
-    const textDecoder = new TextDecoder('utf-8');
     const parse = (buffer) => {
-        const reader = new Reader(buffer);
+        const reader = new Reader(buffer, TextDecoder);
         const dataView = reader.dataView; // TODO: kill this
 
         const parseSections = (reader) => {
@@ -234,7 +233,8 @@ const createParser = (TextDecoder) => {
                 const id = reader.getUint8();
                 const type = sectionTypes[id];
                 const payloadLen = reader.readVarUint();
-                console.log(`section=${type} position=${reader.offset}`);
+                const position = reader.offset;
+                console.log(`section=${type} position=${position}`);
         
                 let section;
                 switch(type) { // TODO: map instead of switch
@@ -254,46 +254,36 @@ const createParser = (TextDecoder) => {
                         section = parseGlobalSection(dataView, reader.offset);
                         break;
                     case 'Export':
-                        section = parseExportSection(dataView, reader.offset);
+                        section = parseExportSection(reader);
                         break;
                     default:
                         throw new Error('Invalid type: ' + type);
                 }
                 sections.push(section);
         
-                reader.offset += payloadLen;
+                reader.offset = position + payloadLen;
             }
             return sections;
         }    
 
-        const parseExportEntry = (dataView, offset) => {
-            const [fieldLen, _1] = readVarUint(dataView, offset);
-            offset += _1;
-            const bytes = dataView.buffer.slice(offset, offset + fieldLen);
-            const fieldStr = textDecoder.decode(bytes);
-            offset += fieldLen;
-            const kindId = dataView.getUint8(offset);
+        const parseExportEntry = (reader) => {
+            const fieldLen = reader.readVarUint();
+            const field = reader.readString(fieldLen);
+            const kindId = reader.getUint8();
             const kind = externalKind[kindId];
-            offset += 1;
-            const [index, _2] = readVarUint(dataView, offset);
-            const exportEntry = {
-                field: fieldStr,
-                kind,
-                index
-            };
-            return [exportEntry, _1 + fieldLen + _2 + 1];
+            const index = reader.readVarUint();
+            const exportEntry = {field, kind, index};
+            return exportEntry;
         }      
         
-        const parseExportSection = (dataView, offset) => {
-            const [count, _1] = readVarUint(dataView, offset);
-            offset += _1;
+        const parseExportSection = (reader) => {
+            const count = reader.readVarUint();
             const section = {
                 type: 'Export',
                 exports: []
             }
             for(let i = 0; i < count; i++) {
-                const [exportEntry, _2] = parseExportEntry(dataView, offset);
-                offset += _2;
+                const exportEntry = parseExportEntry(reader);
                 section.exports.push(exportEntry);
             }
             return section;

@@ -1,7 +1,8 @@
 export default class Reader {
-    constructor(buffer) {
+    constructor(buffer, TextDecoder) {
         this.buffer = buffer;
         this.dataView = new DataView(buffer);
+        this.textDecoder = new TextDecoder('utf-8');
         this.offset = 0;
     }
 
@@ -48,6 +49,13 @@ export default class Reader {
         } while(byte & 0x80);
         this.offset += count;
         return val;
+    }
+
+    readString(len) {
+        const bytes = this.buffer.slice(this.offset, this.offset + len);
+        const str = this.textDecoder.decode(bytes);
+        this.offset += len;
+        return str;
     }
 
     get available() {
