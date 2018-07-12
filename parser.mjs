@@ -1,12 +1,6 @@
 import Reader from './Reader.mjs';
 
-/*
-For the hex impaired:
-80   40  20  10   8   4   2   1 (hex value)
-128  64  32  16   8   4   2   1 (decimal value)
-8    7   6   5    4   3   2   1 (bit position)
-*/
-// https://en.wikipedia.org/wiki/LEB128
+// TODO: kill
 const readVarUint = (dataView, offset) => {
     let [val, count, byte] = [0, 0, 0];
     do {
@@ -16,6 +10,7 @@ const readVarUint = (dataView, offset) => {
     return [val, count];
 }
 
+// TODO: kill
 const readVarInt = (dataView, offset) => {
     let [val, count, byte, mask] = [0, 0, 0, 0];
     do {
@@ -233,41 +228,40 @@ const createParser = (TextDecoder) => {
         const reader = new Reader(buffer);
         const dataView = reader.dataView; // TODO: kill this
 
-        const parseSections = (dataView, offset) => {
+        const parseSections = (reader) => {
             const sections = [];
-            while(offset < dataView.byteLength) {
-                const id = dataView.getUint8(offset++);
+            while(reader.available) {
+                const id = reader.getUint8();
                 const type = sectionTypes[id];
-                const [payloadLen, lenLen] = readVarUint(dataView, offset);
-                console.log(`section=${type} position=${offset}`);
+                const payloadLen = reader.readVarUint();
+                console.log(`section=${type} position=${reader.offset}`);
         
-                offset += lenLen;
                 let section;
                 switch(type) { // TODO: map instead of switch
                     case 'Type': 
-                        section = parseTypeSection(dataView, offset);
+                        section = parseTypeSection(dataView, reader.offset);
                         break;
                     case 'Function':
-                        section = parseFunctionSection(dataView, offset);
+                        section = parseFunctionSection(dataView, reader.offset);
                         break;
                     case 'Table':
-                        section = parseTableSection(dataView, offset);
+                        section = parseTableSection(dataView, reader.offset);
                         break;
                     case 'Memory':
-                        section = parseMemorySection(dataView, offset);
+                        section = parseMemorySection(dataView, reader.offset);
                         break;
                     case 'Global':
-                        section = parseGlobalSection(dataView, offset);
+                        section = parseGlobalSection(dataView, reader.offset);
                         break;
                     case 'Export':
-                        section = parseExportSection(dataView, offset);
+                        section = parseExportSection(dataView, reader.offset);
                         break;
                     default:
                         throw new Error('Invalid type: ' + type);
                 }
                 sections.push(section);
         
-                offset += payloadLen;
+                reader.offset += payloadLen;
             }
             return sections;
         }    
@@ -311,7 +305,7 @@ const createParser = (TextDecoder) => {
         }
         const version = reader.getUint32();
         console.log('wasm version=', version);
-        const sections = parseSections(dataView, reader.offset);
+        const sections = parseSections(reader);
         return {
             type: 'module',
             version: version,
