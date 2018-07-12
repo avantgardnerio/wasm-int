@@ -225,96 +225,97 @@ const parseGlobalSection = (dataView, offset) => {
     return section;
 }
 
-class WasmParser {
-    constructor(textDecoder) {
-        this.textDecoder = textDecoder;
-    }
+const createParser = (TextDecoder) => {
+    const textDecoder = new TextDecoder('utf-8');
+    const parse = (buffer) => {
+        const dataView = new DataView(buffer);
 
-    parse(dataView) {
+        const parseSections = (dataView, offset) => {
+            const sections = [];
+            while(offset < dataView.byteLength) {
+                const id = dataView.getUint8(offset++);
+                const type = sectionTypes[id];
+                const [payloadLen, lenLen] = readVarUint(dataView, offset);
+                console.log(`section=${type} position=${offset}`);
+        
+                offset += lenLen;
+                let section;
+                switch(type) { // TODO: map instead of switch
+                    case 'Type': 
+                        section = parseTypeSection(dataView, offset);
+                        break;
+                    case 'Function':
+                        section = parseFunctionSection(dataView, offset);
+                        break;
+                    case 'Table':
+                        section = parseTableSection(dataView, offset);
+                        break;
+                    case 'Memory':
+                        section = parseMemorySection(dataView, offset);
+                        break;
+                    case 'Global':
+                        section = parseGlobalSection(dataView, offset);
+                        break;
+                    case 'Export':
+                        section = parseExportSection(dataView, offset);
+                        break;
+                    default:
+                        throw new Error('Invalid type: ' + type);
+                }
+                sections.push(section);
+        
+                offset += payloadLen;
+            }
+            return sections;
+        }    
+
+        const parseExportEntry = (dataView, offset) => {
+            const [fieldLen, _1] = readVarUint(dataView, offset);
+            offset += _1;
+            const bytes = dataView.buffer.slice(offset, offset + fieldLen);
+            const fieldStr = textDecoder.decode(bytes);
+            offset += fieldLen;
+            const kindId = dataView.getUint8(offset);
+            const kind = externalKind[kindId];
+            offset += 1;
+            const [index, _2] = readVarUint(dataView, offset);
+            const exportEntry = {
+                field: fieldStr,
+                kind,
+                index
+            };
+            return [exportEntry, _1 + fieldLen + _2 + 1];
+        }      
+        
+        const parseExportSection = (dataView, offset) => {
+            const [count, _1] = readVarUint(dataView, offset);
+            offset += _1;
+            const section = {
+                type: 'Export',
+                exports: []
+            }
+            for(let i = 0; i < count; i++) {
+                const [exportEntry, _2] = parseExportEntry(dataView, offset);
+                offset += _2;
+                section.exports.push(exportEntry);
+            }
+            return section;
+        }        
+
         const magicNumber = dataView.getUint32(0, true);
         if(magicNumber !== 0x6d736100) {
             throw new Error('Invalid preamble!');
         }
         const version = dataView.getUint32(4, true);
         console.log('wasm version=', version);
-        const sections = this.parseSections(dataView, 8);
+        const sections = parseSections(dataView, 8);
         return {
             type: 'module',
             version: version,
             sections
         };
     }
-
-    parseSections(dataView, offset) {
-        const sections = [];
-        while(offset < dataView.byteLength) {
-            const id = dataView.getUint8(offset++);
-            const type = sectionTypes[id];
-            const [payloadLen, lenLen] = readVarUint(dataView, offset);
-            console.log(`section=${type} position=${offset}`);
-    
-            offset += lenLen;
-            let section;
-            switch(type) { // TODO: map instead of switch
-                case 'Type': 
-                    section = parseTypeSection(dataView, offset);
-                    break;
-                case 'Function':
-                    section = parseFunctionSection(dataView, offset);
-                    break;
-                case 'Table':
-                    section = parseTableSection(dataView, offset);
-                    break;
-                case 'Memory':
-                    section = parseMemorySection(dataView, offset);
-                    break;
-                case 'Global':
-                    section = parseGlobalSection(dataView, offset);
-                    break;
-                case 'Export':
-                    section = this.parseExportSection(dataView, offset);
-                    break;
-                default:
-                    throw new Error('Invalid type: ' + type);
-            }
-            sections.push(section);
-    
-            offset += payloadLen;
-        }
-        return sections;
-    }
-
-    parseExportEntry(dataView, offset) {
-        const [fieldLen, _1] = readVarUint(dataView, offset);
-        offset += _1;
-        const bytes = dataView.buffer.slice(offset, offset + fieldLen);
-        const fieldStr = this.textDecoder.decode(bytes);
-        offset += fieldLen;
-        const kindId = dataView.getUint8(offset);
-        const kind = externalKind[kindId];
-        offset += 1;
-        const [index, _2] = readVarUint(dataView, offset);
-        const exportEntry = {
-            field: fieldStr,
-            kind,
-            index
-        };
-        return [exportEntry, _1 + fieldLen + _2 + 1];
-    }    
-
-    parseExportSection(dataView, offset) {
-        const [count, _1] = readVarUint(dataView, offset);
-        offset += _1;
-        const section = {
-            type: 'Export',
-            exports: []
-        }
-        for(let i = 0; i < count; i++) {
-            const [exportEntry, _2] = this.parseExportEntry(dataView, offset);
-            offset += _2;
-            section.exports.push(exportEntry);
-        }
-        return section;
-    }    
+    return parse;
 }
-export default WasmParser;
+
+export default createParser;
