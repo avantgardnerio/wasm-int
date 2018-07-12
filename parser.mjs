@@ -1,3 +1,5 @@
+import Reader from './Reader.mjs';
+
 /*
 For the hex impaired:
 80   40  20  10   8   4   2   1 (hex value)
@@ -228,7 +230,8 @@ const parseGlobalSection = (dataView, offset) => {
 const createParser = (TextDecoder) => {
     const textDecoder = new TextDecoder('utf-8');
     const parse = (buffer) => {
-        const dataView = new DataView(buffer);
+        const reader = new Reader(buffer);
+        const dataView = reader.dataView; // TODO: kill this
 
         const parseSections = (dataView, offset) => {
             const sections = [];
@@ -302,13 +305,13 @@ const createParser = (TextDecoder) => {
             return section;
         }        
 
-        const magicNumber = dataView.getUint32(0, true);
+        const magicNumber = reader.getUint32();
         if(magicNumber !== 0x6d736100) {
             throw new Error('Invalid preamble!');
         }
-        const version = dataView.getUint32(4, true);
+        const version = reader.getUint32();
         console.log('wasm version=', version);
-        const sections = parseSections(dataView, 8);
+        const sections = parseSections(dataView, reader.offset);
         return {
             type: 'module',
             version: version,
