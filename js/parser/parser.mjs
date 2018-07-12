@@ -1,4 +1,4 @@
-import Reader from './Reader.mjs';
+import Reader from '../stream/Reader.mjs';
 
 // TODO: kill
 const readVarUint = (dataView, offset) => {

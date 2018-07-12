@@ -1,0 +1,19 @@
+{
+  "name": "wasm-int",
+  "version": "0.1.0",
+  "description": "A WebAssembly interpreter written in JavaScript.",
+  "main": "js/node.mjs",
+  "scripts": {
+    "test": "node --experimental-modules js/node.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bgard6977/wasm-int.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bgard6977/wasm-int/issues"
+  },
+  "homepage": "https://github.com/bgard6977/wasm-int#readme"
+}

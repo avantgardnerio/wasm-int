@@ -2,7 +2,7 @@ import fs from 'fs';
 import {TextDecoder} from 'util';
 import {promisify} from 'util';
 
-import createParser from './parser.mjs';
+import createParser from './parser/parser.mjs';
 
 const readFile = promisify(fs.readFile);
 
