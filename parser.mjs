@@ -66,7 +66,8 @@ const readType = (dataView, offset) => {
 }
 
 // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#func_type
-const parseFuncType = (dataView, offset) => {
+const parseFuncType = (dataView, original) => {
+    let offset = original; // TODO: Fix this horrible pattern
     const [form, _1] = readType(dataView, offset);
     offset += _1;
     const [paramCount, _2] = readVarUint(dataView, offset);
@@ -74,23 +75,38 @@ const parseFuncType = (dataView, offset) => {
     const func = {
         type: 'function',
         returnType: typeConstructors[form],
-        parameters: []
+        parameterTypes: [],
+        returnTypes: []
     };
     for(let i = 0; i < paramCount; i++) {
         const [paramType, _3] = readType(dataView, offset);
         offset += _3;
-        func.parameters.push(typeConstructors[paramType]);
+        func.parameterTypes.push(typeConstructors[paramType]);
     }
-    return func;
+    const [returnCount, _4] = readVarUint(dataView, offset);
+    offset += _4;
+    for(let i = 0; i < returnCount; i++) {
+        const [returnType, _5] = readType(dataView, offset);
+        offset += _5;
+        func.returnTypes.push(typeConstructors[returnType]);
+    }
+    const ret = returnCount === 1 ? func.returnTypes[0] : 'void';
+    const p = func.parameterTypes.join(', ');
+    console.log(`${ret} xxx(${p})`);
+    return [func, offset - original];
 }
 
 // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#type-section
 const parseType = (dataView, offset) => { // Function signature declarations
     const [count, countLen] = readVarUint(dataView, offset);
     offset += countLen;
+    const functionSignatures = [];
     for(let i = 0; i < count; i++) {
-        parseFuncType(dataView, offset);
+        const [func, _1] = parseFuncType(dataView, offset);
+        offset += _1;
+        functionSignatures.push(func);
     }
+    return functionSignatures;
 }
 
 /*
@@ -110,11 +126,12 @@ const parseSections = (dataView, offset) => {
 
         offset += lenLen;
         let section;
-        switch(type) {
+        switch(type) { // TODO: map instead of switch
             case 'Type': 
                 section = parseType(dataView, offset);
+                break;
             default:
-                throw new Error('Invalid type: ', type);
+                throw new Error('Invalid type: ' + type);
         }
         sections.push(section);
 
