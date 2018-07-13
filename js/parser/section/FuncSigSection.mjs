@@ -12,11 +12,11 @@ const typeConstructors = {
 
 export default class FuncSigSection extends Section {
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#type-section
-    parse(reader) { // Function signature declarations
-        const count = reader.readVarUint();
+    parse() { // Function signature declarations
+        const count = this.reader.readVarUint();
         const functionSignatures = [];
         for(let i = 0; i < count; i++) {
-            const func = this.parseFuncType(reader);
+            const func = this.parseFuncType();
             functionSignatures.push(func);
         }
         return {
@@ -26,9 +26,9 @@ export default class FuncSigSection extends Section {
     }
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#func_type
-    parseFuncType(reader) {
-        const form = reader.readVarInt();
-        const paramCount = reader.readVarUint();
+    parseFuncType() {
+        const form = this.reader.readVarInt();
+        const paramCount = this.reader.readVarUint();
         const func = {
             type: 'function',
             returnType: typeConstructors[form],
@@ -36,12 +36,12 @@ export default class FuncSigSection extends Section {
             returnTypes: []
         };
         for(let i = 0; i < paramCount; i++) {
-            const paramType = reader.readVarInt();
+            const paramType = this.reader.readVarInt();
             func.parameterTypes.push(typeConstructors[paramType]);
         }
-        const returnCount = reader.readVarUint();
+        const returnCount = this.reader.readVarUint();
         for(let i = 0; i < returnCount; i++) {
-            const returnType = reader.readVarInt();
+            const returnType = this.reader.readVarInt();
             func.returnTypes.push(typeConstructors[returnType]);
         }
         const ret = returnCount === 1 ? func.returnTypes[0] : 'void';
@@ -50,4 +50,7 @@ export default class FuncSigSection extends Section {
         return func;
     }
 
+    static get type() {
+        return 1;
+    }
 }
