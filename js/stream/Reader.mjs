@@ -30,7 +30,7 @@ export default class Reader {
             val |= (byte & 0x7F) << (count++ * 7);
         } while(byte & 0x80);
         this.offset += count;
-        return val;
+        return parseInt(val);
     }
 
     readVarInt() {
@@ -52,10 +52,15 @@ export default class Reader {
     }
 
     readString(len) {
-        const bytes = this.buffer.slice(this.offset, this.offset + len);
+        const bytes = this.readBytes(len);
         const str = this.textDecoder.decode(bytes);
-        this.offset += len;
         return str;
+    }
+
+    readBytes(len) {
+        const bytes = this.buffer.slice(this.offset, this.offset + len);
+        this.offset += len;
+        return bytes;
     }
 
     get available() {
