@@ -2,7 +2,7 @@ export default class Reader {
     constructor(buffer, TextDecoder) {
         this.buffer = buffer;
         this.dataView = new DataView(buffer);
-        this.textDecoder = new TextDecoder('utf-8');
+        if(TextDecoder) this.textDecoder = new TextDecoder('utf-8');
         this.offset = 0;
     }
 

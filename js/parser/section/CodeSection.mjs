@@ -1,4 +1,5 @@
 import Section from './Section.mjs';
+import Decoder from '../../decode/Decoder.mjs';
 
 export default class CodeSection extends Section {
 
@@ -15,7 +16,8 @@ export default class CodeSection extends Section {
         const localVariables = [...Array(localCount).keys()]
             .map(() => this.readLocalEntry());
         const bytes = this.reader.readBytes(bodySize);
-        return { localVariables, bytes };
+        const code = new Decoder(bytes).decode();
+        return { localVariables, code };
     }
 
     readLocalEntry() {
