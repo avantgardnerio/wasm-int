@@ -18,4 +18,5 @@ before_install:
   - export EM_CONFIG=/home/travis/.emscripten
   - export BINARYEN_ROOT=$TRAVIS_BUILD_DIR/emsdk/clang/e1.38.8_64bit/binaryen
   - export EMSCRIPTEN=$TRAVIS_BUILD_DIR/emsdk/emscripten/1.38.8
+  - strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX
   - cd ..
