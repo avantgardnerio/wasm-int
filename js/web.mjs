@@ -1,4 +1,4 @@
-import WasmParser from './parser/parser.mjs';
+import WasmParser from './parser/WasmParser.mjs';
 
 onload = async () => {
     const buffer = await (await fetch('test.wasm')).arrayBuffer();
