@@ -1,3 +1,20 @@
+dist: xenial
 language: node_js
 node_js:
   - "10.4.0"
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install -y build-essential python2.7 cmake libstdc++6
+  - rm -rf emsdk
+  - git clone https://github.com/juj/emsdk.git
+  - cd emsdk 
+  - ./emsdk install latest
+  - ./emsdk activate latest
+  - export PATH=$PATH:$TRAVIS_BUILD_DIR/emsdk
+  - export PATH=$PATH:$TRAVIS_BUILD_DIR/emsdk/clang/e1.38.8_64bit
+  - export PATH=$PATH:$TRAVIS_BUILD_DIR/emsdk/emscripten/1.38.8
+  - export EMSDK=$TRAVIS_BUILD_DIR/emsdk
+  - export EM_CONFIG=/home/travis/.emscripten
+  - export BINARYEN_ROOT=$TRAVIS_BUILD_DIR/emsdk/clang/e1.38.8_64bit/binaryen
+  - export EMSCRIPTEN=$TRAVIS_BUILD_DIR/emsdk/emscripten/1.38.8
+  - cd ..
