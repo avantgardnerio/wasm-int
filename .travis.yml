@@ -4,7 +4,10 @@ node_js:
   - "10.4.0"
 cache:
   directories:
-    - emsdk
+    - emsdk/clang/
+    - emsdk/emscripten/
+    - emsdk/node/
+    - emsdk/zips/
 before_install:
   - pwd
   - ls -la
