@@ -4,8 +4,8 @@ node_js:
 before_install:
   - pwd
   - ls -la
-  - sudo apt-get update && sudo apt-get upgrade
-  - sudo apt-get install -y build-essential python2.7 cmake
+  - sudo apt-get update
+  - sudo apt-get install -y build-essential python2.7 cmake libstdc++6
   - git clone https://github.com/juj/emsdk.git
   - cd emsdk 
   - ./emsdk install latest
