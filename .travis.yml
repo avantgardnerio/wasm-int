@@ -1,3 +1,9 @@
 language: node_js
 node_js:
   - "10.4.0"
+before_install:
+  - pwd
+  - ls -la
+  - git clone https://github.com/juj/emsdk.git
+  - cd emsdk && ./emsdk update && ./emsdk install latest && ./emsdk activate latest
+  - cd source ./emsdk_env.sh
