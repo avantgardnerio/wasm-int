@@ -13,7 +13,18 @@ before_install:
   - ls -la
   - sudo apt-get update
   - sudo apt-get install -y build-essential python2.7 cmake libstdc++6
+  - mkdir -p emsdk/clang
+  - mkdir -p emsdk/emscripten
+  - mkdir -p emsdk/node
+  - mkdir -p emsdk/zips
+  - mkdir backup/
+  - mv emsdk/clang backup/
+  - mv emsdk/emscripten backup/
+  - mv emsdk/node backup/
+  - mv emsdk/zips backup/
+  - rm -rf emsdk
   - git clone https://github.com/juj/emsdk.git
+  - mv bacup/* emsdk/
   - cd emsdk 
   - ./emsdk install latest
   - ./emsdk activate latest
