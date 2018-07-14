@@ -2,6 +2,9 @@ dist: xenial
 language: node_js
 node_js:
   - "10.4.0"
+ cache:
+    directories:
+     - emsdk
 before_install:
   - pwd
   - ls -la
