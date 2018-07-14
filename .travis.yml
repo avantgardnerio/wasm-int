@@ -13,6 +13,7 @@ before_install:
   - rm -rf emsdk
   - git clone https://github.com/juj/emsdk.git
   - cd emsdk 
+  - mkdir -p $TRAVIS_BUILD_DIR/backup/
   - cp -R $TRAVIS_BUILD_DIR/backup/* .
   - ./emsdk install latest
   - ./emsdk activate latest
