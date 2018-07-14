@@ -4,6 +4,7 @@
   "description": "A WebAssembly interpreter written in JavaScript.",
   "main": "js/node.mjs",
   "scripts": {
+    "start": "lr-http-server .",
     "test": "node --experimental-modules js/node.mjs"
   },
   "repository": {
@@ -15,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/bgard6977/wasm-int/issues"
   },
-  "homepage": "https://github.com/bgard6977/wasm-int#readme"
+  "homepage": "https://github.com/bgard6977/wasm-int#readme",
+  "dependencies": {
+    "lr-http-server": "^0.1.5"
+  }
 }
