@@ -11,11 +11,11 @@ before_install:
   - ./emsdk install latest
   - ./emsdk activate latest
   - printenv
-  - export PATH=$PATH:/home/travis/build/bgard6977/wasm-int/emsdk
-  - export PATH=$PATH:/home/travis/build/bgard6977/wasm-int/emsdk/clang/e1.38.8_64bit
-  - export PATH=$PATH:/home/travis/build/bgard6977/wasm-int/emsdk/emscripten/1.38.8
-  - export EMSDK = /home/travis/build/bgard6977/wasm-int/emsdk
-  - export EM_CONFIG = /home/travis/.emscripten
-  - export BINARYEN_ROOT = /home/travis/build/bgard6977/wasm-int/emsdk/clang/e1.38.8_64bit/binaryen
-  - export EMSCRIPTEN = /home/travis/build/bgard6977/wasm-int/emsdk/emscripten/1.38.8
+  - export PATH=$PATH:$TRAVIS_BUILD_DIR/emsdk
+  - export PATH=$PATH:$TRAVIS_BUILD_DIR/emsdk/clang/e1.38.8_64bit
+  - export PATH=$PATH:$TRAVIS_BUILD_DIR/emsdk/emscripten/1.38.8
+  - export EMSDK=$TRAVIS_BUILD_DIR/emsdk
+  - export EM_CONFIG=/home/travis/.emscripten
+  - export BINARYEN_ROOT=$TRAVIS_BUILD_DIR/emsdk/clang/e1.38.8_64bit/binaryen
+  - export EMSCRIPTEN=$TRAVIS_BUILD_DIR/emsdk/emscripten/1.38.8
   - cd ..
