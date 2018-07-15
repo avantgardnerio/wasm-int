@@ -44,4 +44,9 @@ jasmine.env.describe('WasmParser', () => {
         const result = interpreter.invoke('_i32mul', 3, 4);
         expect(result).toEqual(12);
     })
+
+    jasmine.env.it('should divide int32s', async () => {
+        const result = interpreter.invoke('_i32div_s', 1, 2);
+        expect(result).toEqual(0);
+    })
 })
