@@ -4,12 +4,19 @@ const defaults = {
     'i32': 0
 };
 
+const depths = {
+    'if': 1,
+    'block': 1,
+    'loop': 1,
+    'end': -1
+}
+
 export default class WasmInterpreter {
     constructor(module) {
         this.module = module;
         this.stack = [];
         this.globals = new Array(module.imports.globals.length + module.globals.length);
-        for(let i = 0; i < module.globals.length; i++) {
+        for (let i = 0; i < module.globals.length; i++) {
             const global = module.globals[i];
             const initVal = this.exec(global.initExpr);
             this.globals[i + module.imports.globals.length] = initVal;
@@ -17,20 +24,37 @@ export default class WasmInterpreter {
     }
 
     exec(ops, stack = [], locals, globals) {
+        let depth = 1;
         let ip = 0;
-        while(true) {
+        while (true) {
             const op = ops[ip];
-            const inst = instructions[op.op];
-            if(!inst) throw new Error('Unknown opcode: ' + op.op);
-            const ret = inst(op, stack, locals, globals);
-            if(typeof ret === 'function') return ret();
+            switch (op.op) {
+                case 'if':
+                    if(stack.pop() !== true) {
+                        for(let d = 0; d > 0 || ops[ip].op !== 'end'; ip++) {
+                            d += (depths[ops[ip].op] || 0);
+                        }
+                        // TODO: else
+                    }
+                    break;
+                case 'call':
+                    throw new Error('TODO');
+                case 'end':
+                    depth--;
+                    // TODO: while, block
+                    if (depth === 0) return stack.pop();
+                default:
+                    const inst = instructions[op.op];
+                    if (!inst) throw new Error('Unknown opcode: ' + op.op);
+                    inst(op, stack, locals, globals);
+            }
             ip++;
         }
     }
 
     invoke(functionName, ...args) {
         const func = this.module.exports.functions[functionName];
-        if(func.signature.parameterTypes.length !== args.length) {
+        if (func.signature.parameterTypes.length !== args.length) {
             throw new Error('Argument length mismatch!');
         }
         const locals = [...args, ...func.body.localVariables.map(v => defaults[v])];

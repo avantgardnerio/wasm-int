@@ -12,5 +12,5 @@ export default {
     'i32.const': (i, s, l, g) => s.push(i.value),
     'f32.const': (i, s, l, g) => s.push(i.value),
     'i32.add': (i, s, l, g) => s.push(s.pop() + s.pop()),
-    'end': (i, s, l, g) => () => s.pop()
+    'i32.ge_s': (i, s, l, g) => s.push(s.pop() >= s.pop()),
 }
