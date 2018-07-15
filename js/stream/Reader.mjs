@@ -12,6 +12,18 @@ export default class Reader {
         return val;
     }
 
+    getFloat32() {
+        const val = this.dataView.getFloat32(this.offset, true);
+        this.offset += 4;
+        return val;
+    }
+
+    getFloat64() {
+        const val = this.dataView.getFloat64(this.offset, true);
+        this.offset += 8;
+        return val;
+    }
+
     getUint8() {
         return this.dataView.getUint8(this.offset++, true);
     }

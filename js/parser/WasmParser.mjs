@@ -7,6 +7,10 @@ import MemorySection from './section/MemorySection.mjs';
 import GlobalSection from './section/GlobalSection.mjs';
 import ExportSection from './section/ExportSection.mjs';
 import CodeSection from './section/CodeSection.mjs';
+import ImportSection from './section/ImportSection.mjs';
+import ElementSection from './section/ElementSection.mjs';
+
+import denormalize from './denormalizer.mjs';
 
 const parsers = [
     FuncSigSection, 
@@ -15,7 +19,9 @@ const parsers = [
     MemorySection,
     GlobalSection,
     ExportSection,
-    CodeSection
+    CodeSection,
+    ImportSection,
+    ElementSection
 ];
 
 export default class WasmParser {
@@ -32,11 +38,12 @@ export default class WasmParser {
         const version = this.reader.getUint32();
         console.log('wasm version=', version);
         const sections = this.parseSections();
-        return {
+        const module = {
             type: 'module',
             version: version,
             sections
         };
+        return denormalize(module);
     }
 
     parseSections() {
@@ -46,14 +53,15 @@ export default class WasmParser {
             const payloadLen = this.reader.readVarUint();
             const position = this.reader.offset;
             console.log(`section=${type} position=${position}`);
-    
-            const Parser = parsers.find(s => s.type === type);
-            if(!Parser) {
-                throw new Error('Invalid type: ' + type);
+            if(type !== 0) {
+                const Parser = parsers.find(s => s.type === type);
+                if(!Parser) {
+                    throw new Error('Unknown section type: ' + type);
+                }
+                const parser = new Parser(this.reader);
+                const section = parser.parse();
+                sections.push(section);
             }
-            const parser = new Parser(this.reader);
-            const section = parser.parse();
-            sections.push(section);
     
             this.reader.offset = position + payloadLen;
         }

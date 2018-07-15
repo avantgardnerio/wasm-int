@@ -1,25 +1,32 @@
-import Reader from "../stream/Reader.mjs";
-
 import opcodes from './opcodes.mjs';
 
+const depths = {
+    'if': 1,
+    'block': 1,
+    'loop': 1,
+    'end': -1
+}
+
 export default class Decoder {
-    constructor(buffer) {
-        this.buffer = buffer;
-        this.reader = new Reader(buffer);
-        this.opcodes = opcodes.reduce((acc, cur) => {
-            return {...acc, [cur.code]: new cur()}
-        }, {});
+    constructor(reader) {
+        this.reader = reader;
     }
 
     decode() {
         const instructions = [];
-        while(this.reader.available) {
-            const opcode = this.reader.getUint8();
-            const decoder = this.opcodes[opcode];
-            if(!decoder) throw new Error('Unknown opcode: ' + opcode);
-            const op = decoder.decode(this.reader);
+        let opcode;
+        let depth = 0;
+        do {
+            opcode = this.reader.getUint8();
+            const key = '0x' + ('00' + opcode.toString(16)).substr(-2);
+            const decoder = opcodes[key]; // TODO: kill string BS
+            if(!decoder) {
+                throw new Error('Unknown opcode: ' + opcode);
+            }
+            const op = decoder(this.reader);
+            depth += (depths[op.op] || 0);
             instructions.push(op);
-        }
+        } while(depth >= 0 || opcode !== 0x0B);
         return instructions;
     }
 }

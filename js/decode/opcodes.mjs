@@ -1,11 +1,17 @@
-import variables from './variables/index.mjs';
-import constants from './constants/index.mjs';
-import numeric from './numeric/index.mjs';
-import flow from './flow/index.mjs';
-
-export default [
-    ...variables,
-    ...constants,
-    ...numeric,
-    ...flow
-];
+export default {
+    '0x01': r => ({ op: 'nop' }),
+    '0x02': r => ({ op: 'block', type: r.readVarUint() }),
+    '0x04': r => ({ op: 'if', type: r.readVarInt() }),
+    '0x0b': r => ({ op: 'end' }),
+    '0x0f': r => ({ op: 'return' }),
+    '0x10': r => ({ op: 'call', functionIndex: r.readVarUint() }),
+    '0x20': r => ({ op: 'get_local', localIndex: r.readVarUint() }),
+    '0x21': r => ({ op: 'set_local', localIndex: r.readVarUint() }),
+    '0x23': r => ({ op: 'get_global', globalIndex: r.readVarUint() }),
+    '0x24': r => ({ op: 'set_global', globalIndex: r.readVarUint() }),
+    '0x41': r => ({ op: 'i32.const', value: r.readVarInt() }),
+    '0x43': r => ({ op: 'f32.const', value: r.getFloat32() }),
+    '0x44': r => ({ op: 'f64.const', value: r.getFloat64() }),
+    '0x4e': r => ({ op: 'i32.ge_s' }),
+    '0x6a': r => ({ op: 'i32.add' }),
+}

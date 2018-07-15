@@ -1,54 +1,66 @@
+import instructions from './instructions.mjs';
+
+const defaults = {
+    'i32': 0
+};
+
+const depths = {
+    'if': 1,
+    'block': 1,
+    'loop': 1,
+    'end': -1
+}
+
 export default class WasmInterpreter {
-    constructor(modules) {
-        this.modules = modules;
+    constructor(module) {
+        this.module = module;
         this.stack = [];
+        this.globals = new Array(module.imports.globals.length + module.globals.length);
+        for (let i = 0; i < module.globals.length; i++) {
+            const global = module.globals[i];
+            const initVal = this.exec(global.initExpr);
+            this.globals[i + module.imports.globals.length] = initVal;
+        }
+    }
+
+    exec(ops, stack = [], locals, globals) {
+        let depth = 1;
+        let ip = 0;
+        while (true) {
+            const op = ops[ip];
+            switch (op.op) {
+                case 'if':
+                    if(stack.pop() !== true) {
+                        for(let d = 0; d > 1 || ops[ip].op !== 'end'; ip++) {
+                            d += (depths[ops[ip].op] || 0);
+                        }
+                        // TODO: else
+                    }
+                    break;
+                case 'return':
+                    return stack.pop();
+                case 'call':
+                    throw new Error('TODO');
+                case 'end':
+                    depth--;
+                    // TODO: while, block
+                    if (depth === 0) return stack.pop();
+                default:
+                    const inst = instructions[op.op];
+                    if (!inst) throw new Error('Unknown opcode: ' + op.op);
+                    inst(op, stack, locals, globals);
+            }
+            ip++;
+        }
     }
 
     invoke(functionName, ...args) {
-        for(let module of this.modules) {
-            const exports = module.sections.find(s => s.type === 'Export');
-            const funcIdxs = module.sections.find(s => s.type === 'Function');
-            const bodies = module.sections.find(s => s.type === 'Code');
-            const types = module.sections.find(s => s.type === 'Types');
-            const functions = exports.exports.filter(e => e.kind === 'Function');
-            const func = functions.find(f => f.field === functionName);
-            const typeIdx = funcIdxs.functionSignatureIndices[func.index];
-            const body = bodies.functions[func.index];
-            const type = types.functionSignatures[typeIdx];
-            if(type.parameterTypes.length !== args.length) {
-                throw new Error('Argument length mismatch!');
-            }
-            let ip = 0;
-            while(true) {
-                const op = body.code[ip];
-                switch(op.op) {
-                    case 'get_local':
-                        const val = args[op.localIndex];
-                        this.stack.push(val);
-                        break;
-                    case 'i32.const':
-                        this.stack.push(op.value);
-                        break;
-                    case 'i32.add':
-                        const a = this.stack.pop();
-                        const b = this.stack.pop();
-                        const res = a + b;
-                        this.stack.push(res);
-                        break;
-                    case 'end':
-                        if(type.returnTypes.length > 1) {
-                            throw new Error('Multiple return types not implemented!');
-                        }
-                        if(type.returnTypes.length === 0) {
-                            return;
-                        }
-                        const finalResult = this.stack.pop();
-                        return finalResult;
-                    default:
-                        throw new Error('Unknown opcode: ', op.op);
-                }
-                ip++;
-            }
+        const func = this.module.exports.functions[functionName];
+        if (func.signature.parameterTypes.length !== args.length) {
+            throw new Error('Argument length mismatch!');
         }
+        const locals = [...args, ...func.body.localVariables.map(v => defaults[v])];
+        const result = this.exec(func.body.code, this.stack, locals, this.globals);
+        return result;
     }
 }
