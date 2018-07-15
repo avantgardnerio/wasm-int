@@ -26,17 +26,22 @@ jasmine.env.describe('WasmParser', () => {
             interpreter = new WasmInterpreter(module);
         } catch(ex) {
             console.error(ex);
+            jasmine.env.fail(ex);
         }
     });
 
     jasmine.env.it('should add int32s', async () => {
-        const result = interpreter.invoke('_addInt32s', 3, 5);
+        const result = interpreter.invoke('_i32add', 3, 5);
         expect(result).toEqual(8);
     })
 
     jasmine.env.it('should subtract int32s', async () => {
-        const result = interpreter.invoke('_subInt32s', 11, 7);
+        const result = interpreter.invoke('_i32sub', 11, 7);
         expect(result).toEqual(4);
     })
 
+    jasmine.env.it('should multiply int32s', async () => {
+        const result = interpreter.invoke('_i32mul', 3, 4);
+        expect(result).toEqual(12);
+    })
 })
