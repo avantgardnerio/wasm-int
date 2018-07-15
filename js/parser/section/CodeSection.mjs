@@ -1,5 +1,6 @@
 import Section from './Section.mjs';
 import Decoder from '../../decode/Decoder.mjs';
+import { access } from 'fs';
 
 export default class CodeSection extends Section {
 
@@ -14,16 +15,16 @@ export default class CodeSection extends Section {
         const bodySize = this.reader.readVarUint();
         const localCount = this.reader.readVarUint();
         const localVariables = [...Array(localCount).keys()]
-            .map(() => this.readLocalEntry());
+            .map(() => this.readLocalEntry())
+            .reduce((a, c) => [...a, ...Array(c.count).fill(c.type)], []);
         const code = new Decoder(this.reader).decode();
         return { localVariables, code };
     }
 
     readLocalEntry() {
         const count = this.reader.readVarUint();
-        const types = [...Array(count).keys()]
-            .map(() => this.reader.readVarInt());
-        return { types };
+        const type = this.typeConstructors[this.reader.readVarInt()];
+        return { type, count };
     }
 
     static get type() {
