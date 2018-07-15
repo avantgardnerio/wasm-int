@@ -110,7 +110,7 @@ export default {
     'i32.popcnt': notImplemented,
     'i32.add': (i, s, l, g) => s.push(s.pop() + s.pop()),
     'i32.sub': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a - b) },
-    'i32.mul': notImplemented,
+    'i32.mul': (i, s, l, g) => s.push(s.pop() * s.pop()),
     'i32.div_s': notImplemented,
     'i32.div_u': notImplemented,
     'i32.rem_s': notImplemented,

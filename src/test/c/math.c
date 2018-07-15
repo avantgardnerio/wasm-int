@@ -1,7 +1,11 @@
-int addInt32s(int a, int b) {
+int i32add(int a, int b) {
   return a + b;
 }
 
-int subInt32s(int a, int b) {
+int i32sub(int a, int b) {
   return a - b;
+}
+
+int i32mul(int a, int b) {
+  return a * b;
 }
