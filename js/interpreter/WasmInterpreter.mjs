@@ -6,16 +6,8 @@ export default class WasmInterpreter {
 
     invoke(functionName, ...args) {
         for(let module of this.modules) {
-            const exports = module.sections.find(s => s.type === 'Export');
-            const funcIdxs = module.sections.find(s => s.type === 'Function');
-            const bodies = module.sections.find(s => s.type === 'Code');
-            const types = module.sections.find(s => s.type === 'Types');
-            const functions = exports.exports.filter(e => e.kind === 'Function');
-            const func = functions.find(f => f.field === functionName);
-            const typeIdx = funcIdxs.functionSignatureIndices[func.index];
-            const body = bodies.functions[func.index];
-            const type = types.functionSignatures[typeIdx];
-            if(type.parameterTypes.length !== args.length) {
+            const func = module.exports.functions[functionName];
+            if(func.signature.parameterTypes.length !== args.length) {
                 throw new Error('Argument length mismatch!');
             }
             let ip = 0;

@@ -10,6 +10,8 @@ import CodeSection from './section/CodeSection.mjs';
 import ImportSection from './section/ImportSection.mjs';
 import ElementSection from './section/ElementSection.mjs';
 
+import denormalize from './denormalizer.mjs';
+
 const parsers = [
     FuncSigSection, 
     FunctionSection,
@@ -36,11 +38,12 @@ export default class WasmParser {
         const version = this.reader.getUint32();
         console.log('wasm version=', version);
         const sections = this.parseSections();
-        return {
+        const module = {
             type: 'module',
             version: version,
             sections
         };
+        return denormalize(module);
     }
 
     parseSections() {
