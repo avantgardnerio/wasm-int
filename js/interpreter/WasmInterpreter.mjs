@@ -12,11 +12,14 @@ export default class WasmInterpreter {
             }
             let ip = 0;
             while(true) {
-                const op = body.code[ip];
+                const op = func.body.code[ip];
                 switch(op.op) {
                     case 'get_local':
                         const val = args[op.localIndex];
                         this.stack.push(val);
+                        break;
+                    case 'get_global':
+                        throw new Error('TODO');
                         break;
                     case 'i32.const':
                         this.stack.push(op.value);

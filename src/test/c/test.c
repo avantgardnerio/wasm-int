@@ -1,3 +1,3 @@
-int main(int a) {
-  return a + 1;
+int addOne(int a) {
+  return a + 42;
 }

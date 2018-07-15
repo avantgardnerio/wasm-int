@@ -5,21 +5,30 @@ const denormalize = (module) => {
     const funcIdxs = module.sections.filter(s => s.type === 'Function');
     const bodies = module.sections.filter(s => s.type === 'Code');
     const types = module.sections.filter(s => s.type === 'Types');
+    const imports = module.sections.filter(s => s.type === 'Import');
 
-    if(exports.length !== 1) throw new Error('Expected 1 exports section!');
-    if(funcIdxs.length !== 1) throw new Error('Expected 1 exports section!');
-    if(bodies.length !== 1) throw new Error('Expected 1 exports section!');
-    if(types.length !== 1) throw new Error('Expected 1 exports section!');
+    if(exports.length !== 1) throw new Error('Expected 1 Export section!');
+    if(funcIdxs.length !== 1) throw new Error('Expected 1 Function section!');
+    if(bodies.length !== 1) throw new Error('Expected 1 Code section!');
+    if(types.length !== 1) throw new Error('Expected 1 Types section!');
+    if(imports.length !== 1) throw new Error('Expected 1 Import section!');
 
     if(bodies.length !== funcIdxs.length) throw new Error('Expected 1 body per function!');
 
+    const importedFunctions = imports[0].imports
+        .filter(i => i.kind === 'Function');
+
+    // https://github.com/WebAssembly/design/blob/master/Modules.md#function-index-space
+    // the index space starts at zero with the function imports (if any) 
+    // followed by the functions defined within the module.
     const exportedFunctions = exports[0].exports
         .filter(e => e.kind === 'Function')
         .map(f => {
-            const sigIdx = funcIdxs[0].functionSignatureIndices[f.index];
+            const realIdx = f.index - importedFunctions.length;
+            const sigIdx = funcIdxs[0].functionSignatureIndices[realIdx];
             return {
                 name: f.field,
-                body: bodies[0][f.index],
+                body: bodies[0].functions[realIdx],
                 signature: types[0].functionSignatures[sigIdx]
             }
         }).reduce((acc, cur) => ({...acc, [cur.name]: cur}), {});
