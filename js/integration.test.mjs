@@ -23,14 +23,14 @@ jasmine.env.describe('WasmParser', () => {
         interpreter = new WasmInterpreter(module);
     });
 
-    jasmine.env.it('should parse', async () => {
-        try {
-            const result = interpreter.invoke('_addInt32s', 3, 5);
-            expect(result).toEqual(8);
-        } catch(ex) {
-            console.error(ex);
-            fail(ex);
-        }
+    jasmine.env.it('should add int32s', async () => {
+        const result = interpreter.invoke('_addInt32s', 3, 5);
+        expect(result).toEqual(8);
+    })
+
+    jasmine.env.it('should subtract int32s', async () => {
+        const result = interpreter.invoke('_subInt32s', 11, 7);
+        expect(result).toEqual(4);
     })
 
 })

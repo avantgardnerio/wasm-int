@@ -103,7 +103,7 @@ export default {
     '0x68': notImplemented,
     '0x69': notImplemented,
     '0x6a': r => ({ op: 'i32.add' }),
-    '0x6b': notImplemented,
+    '0x6b': r => ({ op: 'i32.sub' }),
     '0x6c': notImplemented,
     '0x6d': notImplemented,
     '0x6e': notImplemented,

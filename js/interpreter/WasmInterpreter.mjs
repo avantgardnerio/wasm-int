@@ -48,7 +48,11 @@ export default class WasmInterpreter {
                 default:
                     const inst = instructions[op.op];
                     if (!inst) throw new Error('Unknown opcode: ' + op.op);
-                    inst(op, stack, locals, globals);
+                    try {
+                        inst(op, stack, locals, globals);
+                    } catch(ex) {
+                        throw new Error('Error running op: ' + op.op, ex);
+                    }
             }
             ip++;
         }
