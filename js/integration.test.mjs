@@ -22,7 +22,8 @@ jasmine.env.describe('WasmParser', () => {
             const result = interpreter.invoke('main', 1);
             expect(result).toEqual(2);
         } catch(ex) {
-            fail(ex);
+            console.error(ex);
+            expect(ex).toBeUndefined();
         }
     })
 

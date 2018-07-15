@@ -1,4 +1,5 @@
 import Section from './Section.mjs';
+import Decoder from '../../decode/Decoder.mjs';
 
 export default class GlobalSection extends Section {
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#global-section
@@ -18,7 +19,8 @@ export default class GlobalSection extends Section {
     }
 
     parseInitExpr() {
-        throw new Error('TODO');
+        const opcodes = new Decoder(this.reader).decode();
+        return opcodes;
     }    
 
     static get type() {
