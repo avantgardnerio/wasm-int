@@ -35,9 +35,9 @@ export default class Section {
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#global_type
     parseGlobalType() {
-        const contentType = this.typeConstructors[this.reader.readVarInt()];
+        const type = this.typeConstructors[this.reader.readVarInt()];
         const mutability = this.reader.readVarUint();
-        const globalVar = {contentType, mutable: mutability === 1};
+        const globalVar = {type, mutable: mutability === 1};
         return globalVar;
     }    
 

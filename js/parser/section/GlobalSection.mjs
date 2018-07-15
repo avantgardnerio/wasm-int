@@ -10,9 +10,9 @@ export default class GlobalSection extends Section {
             globalVariables: []
         }
         for(let i = 0; i < count; i++) {
-            const globalType = this.parseGlobalType();
+            const type = this.parseGlobalType();
             const initExpr = this.parseInitExpr();
-            const globalVariable = {globalType, initExpr};
+            const globalVariable = {type: type.type, mutable: type.mutable, initExpr};
             section.globalVariables.push(globalVariable);
         }
         return section;

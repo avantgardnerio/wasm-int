@@ -7,13 +7,13 @@ export default class ImportSection extends Section {
             type: 'Import',
             imports: []
         }
-        for(let i = 0; i < count; i++) {
+        for (let i = 0; i < count; i++) {
             const importEntry = this.parseImportEntry();
             section.imports.push(importEntry);
         }
         return section;
-    }        
-        
+    }
+
     parseImportEntry() {
         const moduleLen = this.reader.readVarUint();
         const module = this.reader.readString(moduleLen);
@@ -24,7 +24,7 @@ export default class ImportSection extends Section {
         const kindId = this.reader.getUint8();
         const kind = this.externalKind[kindId];
         let type;
-        switch(kind) {
+        switch (kind) {
             case 'Memory':
                 type = this.parseResizableLimits();
                 break;
@@ -33,20 +33,20 @@ export default class ImportSection extends Section {
                 break;
             case 'Global':
                 type = this.parseGlobalType();
-                break;
+                return { module, field, kind, type: type.type, mutable: type.mutable };
             case 'Function':
                 // the index of the funciton signature
-                type = this.reader.readVarUint(); 
+                type = this.reader.readVarUint();
                 break;
             default:
                 throw new Error('Invalid kind: ' + kind);
         }
 
-        const entry = {module, field, kind, type};
+        const entry = { module, field, kind, type };
         return entry;
-    }      
-    
+    }
+
     static get type() {
         return 2;
-    }   
+    }
 }

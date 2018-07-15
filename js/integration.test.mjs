@@ -18,7 +18,7 @@ jasmine.env.describe('WasmParser', () => {
             const file = await readFile('test.wasm');
             const parser = new WasmParser(file.buffer, TextDecoder);
             const module = parser.parse();
-            const interpreter = new WasmInterpreter([module]);
+            const interpreter = new WasmInterpreter(module);
             const result = interpreter.invoke('_addOne', 1);
             expect(result).toEqual(2);
         } catch(ex) {
