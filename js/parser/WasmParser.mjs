@@ -8,6 +8,7 @@ import GlobalSection from './section/GlobalSection.mjs';
 import ExportSection from './section/ExportSection.mjs';
 import CodeSection from './section/CodeSection.mjs';
 import ImportSection from './section/ImportSection.mjs';
+import ElementSection from './section/ElementSection.mjs';
 
 const parsers = [
     FuncSigSection, 
@@ -17,7 +18,8 @@ const parsers = [
     GlobalSection,
     ExportSection,
     CodeSection,
-    ImportSection
+    ImportSection,
+    ElementSection
 ];
 
 export default class WasmParser {
@@ -51,7 +53,7 @@ export default class WasmParser {
             if(type !== 0) {
                 const Parser = parsers.find(s => s.type === type);
                 if(!Parser) {
-                    throw new Error('Invalid type: ' + type);
+                    throw new Error('Unknown section type: ' + type);
                 }
                 const parser = new Parser(this.reader);
                 const section = parser.parse();

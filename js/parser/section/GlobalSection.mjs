@@ -18,11 +18,6 @@ export default class GlobalSection extends Section {
         return section;
     }
 
-    parseInitExpr() {
-        const opcodes = new Decoder(this.reader).decode();
-        return opcodes;
-    }    
-
     static get type() {
         return 6;
     }

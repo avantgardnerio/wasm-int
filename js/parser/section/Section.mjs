@@ -1,3 +1,5 @@
+import Decoder from '../../decode/Decoder.mjs';
+
 export default class Section {
     constructor(reader) {
         this.reader = reader;
@@ -45,6 +47,11 @@ export default class Section {
         const resizableLimits = this.parseResizableLimits();
         return {type, resizableLimits};
     }
+
+    parseInitExpr() {
+        const opcodes = new Decoder(this.reader).decode();
+        return opcodes;
+    }    
 
     parse() {
         throw new Error('Not implemented');

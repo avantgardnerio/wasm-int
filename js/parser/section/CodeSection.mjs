@@ -15,8 +15,7 @@ export default class CodeSection extends Section {
         const localCount = this.reader.readVarUint();
         const localVariables = [...Array(localCount).keys()]
             .map(() => this.readLocalEntry());
-        const bytes = this.reader.readBytes(bodySize);
-        const code = new Decoder(bytes).decode();
+        const code = new Decoder(this.reader).decode();
         return { localVariables, code };
     }
 
