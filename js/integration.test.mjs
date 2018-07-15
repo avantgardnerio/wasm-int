@@ -13,14 +13,20 @@ jasmine.env.describe('WasmParser', () => {
     let interpreter;
 
     jasmine.env.beforeAll(async () => {
-        const filename = 'math';
-        const cmd = `emcc src/test/c/${filename}.c -O0 -s ONLY_MY_CODE=1 -s SIDE_MODULE=1 -o ${filename}.wasm`;
-        execSync(cmd);
-
-        const file = await readFile('math.wasm');
-        const parser = new WasmParser(file.buffer, TextDecoder);
-        const module = parser.parse();
-        interpreter = new WasmInterpreter(module);
+        try {
+            const filename = 'math';
+            const cmd = `emcc src/test/c/${filename}.c -O0 -s ONLY_MY_CODE=1 -s SIDE_MODULE=1 -o ${filename}.wasm`;
+            console.log('----- running: ' + cmd);
+            execSync(cmd);
+            console.log('----- complete!');
+    
+            const file = await readFile('math.wasm');
+            const parser = new WasmParser(file.buffer, TextDecoder);
+            const module = parser.parse();
+            interpreter = new WasmInterpreter(module);
+        } catch(ex) {
+            console.error(ex);
+        }
     });
 
     jasmine.env.it('should add int32s', async () => {
