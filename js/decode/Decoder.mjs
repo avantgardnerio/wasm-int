@@ -23,9 +23,13 @@ export default class Decoder {
             if(!decoder) {
                 throw new Error('Unknown opcode: ' + opcode);
             }
-            const op = decoder(this.reader);
-            depth += (depths[op.op] || 0);
-            instructions.push(op);
+            try {
+                const op = decoder(this.reader);
+                depth += (depths[op.op] || 0);
+                instructions.push(op);
+            } catch(ex) {
+                throw new Error('Error running op: ' + key, ex);
+            }
         } while(depth >= 0 || opcode !== 0x0B);
         return instructions;
     }

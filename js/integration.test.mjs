@@ -10,26 +10,33 @@ import WasmInterpreter from './interpreter/WasmInterpreter.mjs';
 const readFile = promisify(fs.readFile);
 
 jasmine.env.describe('WasmParser', () => {
-    jasmine.env.it('should parse', async () => {
+    let interpreter;
+
+    jasmine.env.beforeAll(async () => {
         try {
-            const cmd = 'emcc src/test/c/test.c -O0 -s ONLY_MY_CODE=1 -s SIDE_MODULE=1 -o test.wasm';
+            const filename = 'math';
+            const cmd = `emcc src/test/c/${filename}.c -O0 -s ONLY_MY_CODE=1 -s SIDE_MODULE=1 -o ${filename}.wasm`;
+            console.log('----- running: ' + cmd);
             execSync(cmd);
+            console.log('----- complete!');
     
-            const file = await readFile('test.wasm');
+            const file = await readFile('math.wasm');
             const parser = new WasmParser(file.buffer, TextDecoder);
             const module = parser.parse();
-            const interpreter = new WasmInterpreter(module);
-            const result = interpreter.invoke('_addOne', 1);
-            expect(result).toEqual(43);
+            interpreter = new WasmInterpreter(module);
         } catch(ex) {
             console.error(ex);
-            fail(ex);
         }
+    });
+
+    jasmine.env.it('should add int32s', async () => {
+        const result = interpreter.invoke('_addInt32s', 3, 5);
+        expect(result).toEqual(8);
     })
 
-    jasmine.env.xit('should compile C', () => {
-        const cmd = 'emcc hello.c -O0 -s ONLY_MY_CODE=1 -s SIDE_MODULE=1 -o index.wasm';
-        const stdout = execSync(cmd);
-        console.log(stdout);
+    jasmine.env.it('should subtract int32s', async () => {
+        const result = interpreter.invoke('_subInt32s', 11, 7);
+        expect(result).toEqual(4);
     })
+
 })
