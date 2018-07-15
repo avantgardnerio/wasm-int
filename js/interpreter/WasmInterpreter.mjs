@@ -31,7 +31,7 @@ export default class WasmInterpreter {
             switch (op.op) {
                 case 'if':
                     if(stack.pop() !== true) {
-                        for(let d = 0; d > 0 || ops[ip].op !== 'end'; ip++) {
+                        for(let d = 0; d > 1 || ops[ip].op !== 'end'; ip++) {
                             d += (depths[ops[ip].op] || 0);
                         }
                         // TODO: else

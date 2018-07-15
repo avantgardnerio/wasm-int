@@ -7,7 +7,7 @@
 export default {
     'get_local': (i, s, l, g) => s.push(l[i.localIndex]),
     'set_local': (i, s, l, g) => l[i.localIndex] = s.pop(),
-    'get_global': (i, s, l, g) => s.push(l[i.globalIndex]),
+    'get_global': (i, s, l, g) => s.push(g[i.globalIndex]),
     'set_global': (i, s, l, g) => g[i.globalIndex] = s.pop(),
     'i32.const': (i, s, l, g) => s.push(i.value),
     'f32.const': (i, s, l, g) => s.push(i.value),
