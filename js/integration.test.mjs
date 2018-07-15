@@ -20,7 +20,7 @@ jasmine.env.describe('WasmParser', () => {
             const module = parser.parse();
             const interpreter = new WasmInterpreter(module);
             const result = interpreter.invoke('_addOne', 1);
-            expect(result).toEqual(2);
+            expect(result).toEqual(43);
         } catch(ex) {
             console.error(ex);
             fail(ex);

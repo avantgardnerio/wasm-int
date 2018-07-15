@@ -37,6 +37,8 @@ export default class WasmInterpreter {
                         // TODO: else
                     }
                     break;
+                case 'return':
+                    return stack.pop();
                 case 'call':
                     throw new Error('TODO');
                 case 'end':
@@ -58,6 +60,7 @@ export default class WasmInterpreter {
             throw new Error('Argument length mismatch!');
         }
         const locals = [...args, ...func.body.localVariables.map(v => defaults[v])];
-        this.exec(func.body.code, this.stack, locals, this.globals);
+        const result = this.exec(func.body.code, this.stack, locals, this.globals);
+        return result;
     }
 }

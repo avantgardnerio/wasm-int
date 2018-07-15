@@ -1,5 +1,12 @@
 import opcodes from './opcodes.mjs';
 
+const depths = {
+    'if': 1,
+    'block': 1,
+    'loop': 1,
+    'end': -1
+}
+
 export default class Decoder {
     constructor(reader) {
         this.reader = reader;
@@ -8,6 +15,7 @@ export default class Decoder {
     decode() {
         const instructions = [];
         let opcode;
+        let depth = 0;
         do {
             opcode = this.reader.getUint8();
             const key = '0x' + ('00' + opcode.toString(16)).substr(-2);
@@ -16,8 +24,9 @@ export default class Decoder {
                 throw new Error('Unknown opcode: ' + opcode);
             }
             const op = decoder(this.reader);
+            depth += (depths[op.op] || 0);
             instructions.push(op);
-        } while(opcode !== 0x0B);
+        } while(depth >= 0 || opcode !== 0x0B);
         return instructions;
     }
 }

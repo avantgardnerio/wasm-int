@@ -11,6 +11,7 @@ export default {
     '0x24': r => ({ op: 'set_global', globalIndex: r.readVarUint() }),
     '0x41': r => ({ op: 'i32.const', value: r.readVarInt() }),
     '0x43': r => ({ op: 'f32.const', value: r.getFloat32() }),
+    '0x44': r => ({ op: 'f64.const', value: r.getFloat64() }),
     '0x4e': r => ({ op: 'i32.ge_s' }),
     '0x6a': r => ({ op: 'i32.add' }),
 }
