@@ -21,14 +21,6 @@ export default class GlobalSection extends Section {
         throw new Error('TODO');
     }    
 
-    // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#global_type
-    parseGlobalType() {
-        const contentType = this.reader.readVarInt();
-        const mutability = this.reader.readVarUint();
-        const globalVar = {contentType, mutable: mutability === 1};
-        return globalVar;
-    }
-
     static get type() {
         return 6;
     }

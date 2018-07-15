@@ -15,13 +15,6 @@ export default class TableSection extends Section {
         return table;
     }
 
-    // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#table_type
-     parseTableType() {
-        const type = this.reader.readVarInt();
-        const resizableLimits = this.parseResizableLimits();
-        return {type, resizableLimits};
-    }
-
     static get type() {
         return 4;
     }
