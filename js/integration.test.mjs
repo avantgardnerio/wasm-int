@@ -26,6 +26,7 @@ jasmine.env.describe('WasmParser', () => {
             const parser = new WasmParser(file.buffer, TextDecoder);
             const module = parser.parse();
             interpreter = new WasmInterpreter(module);
+            //await new Promise((res) => setTimeout(res, 10000));
             console.log(`\n----- parsed wasm in ${new Date().getTime() - compiled}ms`);
         } catch(ex) {
             console.error(ex);
@@ -33,22 +34,22 @@ jasmine.env.describe('WasmParser', () => {
         }
     });
 
-    jasmine.env.it('should add int32s', async () => {
+    jasmine.env.it('should add int32s', () => {
         const result = interpreter.invoke('_i32add', 3, 5);
         expect(result).toEqual(8);
     })
 
-    jasmine.env.it('should subtract int32s', async () => {
+    jasmine.env.it('should subtract int32s', () => {
         const result = interpreter.invoke('_i32sub', 11, 7);
         expect(result).toEqual(4);
     })
 
-    jasmine.env.it('should multiply int32s', async () => {
+    jasmine.env.it('should multiply int32s', () => {
         const result = interpreter.invoke('_i32mul', 3, 4);
         expect(result).toEqual(12);
     })
 
-    jasmine.env.it('should divide int32s', async () => {
+    jasmine.env.it('should divide int32s', () => {
         const result = interpreter.invoke('_i32div_s', 1, 2);
         expect(result).toEqual(0);
     })
