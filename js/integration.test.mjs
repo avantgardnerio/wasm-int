@@ -26,7 +26,6 @@ jasmine.env.describe('WasmParser', () => {
             const parser = new WasmParser(file.buffer, TextDecoder);
             const module = parser.parse();
             interpreter = new WasmInterpreter(module);
-            //await new Promise((res) => setTimeout(res, 10000));
             console.log(`\n----- parsed wasm in ${new Date().getTime() - compiled}ms`);
         } catch(ex) {
             console.error(ex);
