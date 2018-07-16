@@ -14,16 +14,19 @@ jasmine.env.describe('WasmParser', () => {
 
     jasmine.env.beforeAll(async () => {
         try {
+            const start = new Date().getTime();
             const filename = 'math';
             const cmd = `emcc src/test/c/${filename}.c -O0 -s ONLY_MY_CODE=1 -s SIDE_MODULE=1 -o ${filename}.wasm`;
-            console.log('----- running: ' + cmd);
+            console.log(`\n----- running: ${cmd}`);
             execSync(cmd);
-            console.log('----- complete!');
+            const compiled = new Date().getTime();
+            console.log(`\n----- compiled in ${compiled - start}ms`);
     
             const file = await readFile('math.wasm');
             const parser = new WasmParser(file.buffer, TextDecoder);
             const module = parser.parse();
             interpreter = new WasmInterpreter(module);
+            console.log(`\n----- parsed wasm in ${new Date().getTime() - compiled}ms`);
         } catch(ex) {
             console.error(ex);
             jasmine.env.fail(ex);

@@ -12,5 +12,6 @@ jasmine.addReporter( new JasmineConsoleReporter( {
     listStyle: 'indent',
     activity: false
 } ) );
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
 
 export default jasmine;
