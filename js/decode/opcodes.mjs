@@ -71,7 +71,7 @@ export default {
     '0x4a': r => ({ op: 'i32.gt_s' }),
     '0x4b': r => ({ op: 'i32.gt_u' }),
     '0x4c': r => ({ op: 'i32.le_s' }),
-    '0x4d': notImplemented,
+    '0x4d': r => ({ op: 'i32.le_u' }),
     '0x4e': r => ({ op: 'i32.ge_s' }),
     '0x4f': notImplemented,
     '0x50': notImplemented,
