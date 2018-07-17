@@ -75,7 +75,7 @@ export default {
     'i32.lt_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a < b) },
     'i32.lt_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a < b) },
     'i32.gt_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a > b) },
-    'i32.gt_u': notImplemented,
+    'i32.gt_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a > b) },
     'i32.le_s': notImplemented,
     'i32.le_u': notImplemented,
     'i32.ge_s': (i, s, l, g) => s.push(s.pop() >= s.pop()),
