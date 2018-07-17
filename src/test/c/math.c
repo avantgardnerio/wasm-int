@@ -53,3 +53,7 @@ int i32gt_s(int a, int b) {
 unsigned int i32gt_u(unsigned int a, unsigned int b) {
   return a > b;
 }
+
+int i32le_s(int a, int b) {
+  return a <= b;
+}
