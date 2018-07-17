@@ -64,7 +64,7 @@ export default {
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#comparison-operators-described-here
     '0x45': notImplemented,
-    '0x46': notImplemented,
+    '0x46': r => ({ op: 'i32.eq' }),
     '0x47': notImplemented,
     '0x48': notImplemented,
     '0x49': notImplemented,
