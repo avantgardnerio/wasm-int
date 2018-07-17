@@ -61,4 +61,9 @@ jasmine.env.describe('WasmParser', () => {
         const result = interpreter.invoke('_i32xor', 6, 3);
         expect(result).toEqual(5);
     })
+
+    jasmine.env.it('should shift left int32', () => {
+        const result = interpreter.invoke('_i32shl', 1, 2);
+        expect(result).toEqual(4);
+    })
 })
