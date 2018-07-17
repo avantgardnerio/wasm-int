@@ -106,7 +106,7 @@ export default {
     '0x6b': r => ({ op: 'i32.sub' }),
     '0x6c': r => ({ op: 'i32.mul' }),
     '0x6d': r => ({ op: 'i32.div_s' }),
-    '0x6e': notImplemented,
+    '0x6e': r => ({ op: 'i32.div_u' }),
     '0x6f': notImplemented,
     '0x70': notImplemented,
     '0x71': r => ({ op: 'i32.and' }),
