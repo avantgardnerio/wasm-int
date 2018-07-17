@@ -21,3 +21,7 @@ int i32div_u(unsigned int a, unsigned int b) {
 int i32or(unsigned int a, unsigned int b) {
   return a | b;
 }
+
+int i32xor(unsigned int a, unsigned int b) {
+  return a ^ b;
+}
