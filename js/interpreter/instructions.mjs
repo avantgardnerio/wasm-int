@@ -72,7 +72,7 @@ export default {
     'i32.eqz': notImplemented,
     'i32.eq': (i, s, l, g) => s.push(s.pop() === s.pop() ? 1 : 0),
     'i32.ne': (i, s, l, g) => s.push(s.pop() === s.pop() ? 0 : 1),
-    'i32.lt_s': notImplemented,
+    'i32.lt_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a < b) },
     'i32.lt_u': notImplemented,
     'i32.gt_s': notImplemented,
     'i32.gt_u': notImplemented,
