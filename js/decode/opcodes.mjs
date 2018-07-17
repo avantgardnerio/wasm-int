@@ -67,7 +67,7 @@ export default {
     '0x46': r => ({ op: 'i32.eq' }),
     '0x47': r => ({ op: 'i32.ne' }),
     '0x48': r => ({ op: 'i32.lt_s' }),
-    '0x49': notImplemented,
+    '0x49': r => ({ op: 'i32.lt_u' }),
     '0x4a': notImplemented,
     '0x4b': notImplemented,
     '0x4c': notImplemented,
