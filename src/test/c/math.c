@@ -37,3 +37,19 @@ int i32eq(unsigned int a, unsigned int b) {
 int i32ne(unsigned int a, unsigned int b) {
   return a != b;
 }
+
+int i32lt_s(int a, int b) {
+  return a < b;
+}
+
+unsigned int i32lt_u(unsigned int a, unsigned int b) {
+  return a < b;
+}
+
+int i32gt_s(int a, int b) {
+  return a > b;
+}
+
+unsigned int i32gt_u(unsigned int a, unsigned int b) {
+  return a > b;
+}
