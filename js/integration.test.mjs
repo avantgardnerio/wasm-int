@@ -86,4 +86,10 @@ jasmine.env.describe('WasmParser', () => {
         expect(interpreter.invoke('_i32lt_u', 1, 2)).toEqual(1);
         expect(interpreter.invoke('_i32lt_u', 1, 1)).toEqual(0);
     })
+
+    jasmine.env.it('should gt int32_s', () => {
+        expect(interpreter.invoke('_i32gt_s', 2, 1)).toEqual(1);
+        expect(interpreter.invoke('_i32gt_s', 1, 1)).toEqual(0);
+    })
+
 })
