@@ -17,3 +17,7 @@ int i32div_s(int a, int b) {
 int i32div_u(unsigned int a, unsigned int b) {
   return a / b;
 }
+
+int i32or(unsigned int a, unsigned int b) {
+  return a | b;
+}

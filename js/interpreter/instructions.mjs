@@ -116,7 +116,7 @@ export default {
     'i32.rem_s': notImplemented,
     'i32.rem_u': notImplemented,
     'i32.and': (i, s, l, g) => s.push(s.pop() & s.pop()),
-    'i32.or': notImplemented,
+    'i32.or': (i, s, l, g) => s.push(s.pop() | s.pop()),
     'i32.xor': notImplemented,
     'i32.shl': notImplemented,
     'i32.shr_s': notImplemented,

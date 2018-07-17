@@ -51,4 +51,9 @@ jasmine.env.describe('WasmParser', () => {
         const result = interpreter.invoke('_i32div_u', 5, 2);
         expect(result).toEqual(2);
     })
+
+    jasmine.env.it('should or int32u', () => {
+        const result = interpreter.invoke('_i32or', 1, 2);
+        expect(result).toEqual(3);
+    })
 })
