@@ -70,7 +70,7 @@ export default {
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#comparison-operators-described-here
     'i32.eqz': notImplemented,
-    'i32.eq': notImplemented,
+    'i32.eq': (i, s, l, g) => s.push(s.pop() == s.pop() ? 1 : 0),
     'i32.ne': notImplemented,
     'i32.lt_s': notImplemented,
     'i32.lt_u': notImplemented,
@@ -80,6 +80,7 @@ export default {
     'i32.le_u': notImplemented,
     'i32.ge_s': (i, s, l, g) => s.push(s.pop() >= s.pop()),
     'i32.ge_u': notImplemented,
+
     'i64.eqz': notImplemented,
     'i64.eq': notImplemented,
     'i64.ne': notImplemented,
@@ -91,12 +92,14 @@ export default {
     'i64.le_u': notImplemented,
     'i64.ge_s': notImplemented,
     'i64.ge_u': notImplemented,
+
     'f32.eq': notImplemented,
     'f32.ne': notImplemented,
     'f32.lt': notImplemented,
     'f32.gt': notImplemented,
     'f32.le': notImplemented,
     'f32.ge': notImplemented,
+
     'f64.eq': notImplemented,
     'f64.ne': notImplemented,
     'f64.lt': notImplemented,
@@ -123,6 +126,7 @@ export default {
     'i32.shr_u': notImplemented,
     'i32.rotl': notImplemented,
     'i32.rotr': notImplemented,
+
     'i64.clz': notImplemented,
     'i64.ctz': notImplemented,
     'i64.popcnt': notImplemented,
@@ -141,6 +145,7 @@ export default {
     'i64.shr_u': notImplemented,
     'i64.rotl': notImplemented,
     'i64.rotr': notImplemented,
+
     'f32.abs': notImplemented,
     'f32.neg': notImplemented,
     'f32.ceil': notImplemented,
@@ -155,6 +160,7 @@ export default {
     'f32.min': notImplemented,
     'f32.max': notImplemented,
     'f32.copysign': notImplemented,
+
     'f64.abs': notImplemented,
     'f64.neg': notImplemented,
     'f64.ceil': notImplemented,
@@ -176,17 +182,20 @@ export default {
     'i32.trunc_u/f32': notImplemented,
     'i32.trunc_s/f64': notImplemented,
     'i32.trunc_u/f64': notImplemented,
+
     'i64.extend_s/i32': notImplemented,
     'i64.extend_u/i32': notImplemented,
     'i64.trunc_s/f32': notImplemented,
     'i64.trunc_u/f32': notImplemented,
     'i64.trunc_s/f64': notImplemented,
     'i64.trunc_u/f64': notImplemented,
+
     'f32.convert_s/i32': notImplemented,
     'f32.convert_u/i32': notImplemented,
     'f32.convert_s/i64': notImplemented,
     'f32.convert_u/i64': notImplemented,
     'f32.demote/f64': notImplemented,
+
     'f64.convert_s/i32': notImplemented,
     'f64.convert_u/i32': notImplemented,
     'f64.convert_s/i64': notImplemented,
