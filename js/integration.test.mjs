@@ -19,8 +19,9 @@ jasmine.env.describe('WasmParser', () => {
         const compiled = new Date().getTime();
         console.log(`\n----- compiled in ${compiled - start}ms`);
 
-        const file = readFileSync('math.wasm');
-        const parser = new WasmParser(file.buffer, TextDecoder);
+        const file = fs.readFileSync('math.wasm');
+        const ar = new Uint8Array(file);
+        const parser = new WasmParser(ar.buffer, TextDecoder);
         const module = parser.parse();
         interpreter = new WasmInterpreter(module);
         console.log(`\n----- parsed wasm in ${new Date().getTime() - compiled}ms`);
