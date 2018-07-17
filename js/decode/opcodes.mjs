@@ -110,7 +110,7 @@ export default {
     '0x6f': notImplemented,
     '0x70': notImplemented,
     '0x71': r => ({ op: 'i32.and' }),
-    '0x72': notImplemented,
+    '0x72': r => ({ op: 'i32.or' }),
     '0x73': notImplemented,
     '0x74': notImplemented,
     '0x75': notImplemented,
