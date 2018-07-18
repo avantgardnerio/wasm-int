@@ -5,7 +5,7 @@ const depths = {
     'block': 1,
     'loop': 1,
     'end': -1
-}
+};
 
 export default class Decoder {
     constructor(reader) {
@@ -31,6 +31,35 @@ export default class Decoder {
                 throw new Error('Error running op: ' + key, ex);
             }
         } while(depth >= 0 || opcode !== 0x0B);
-        return instructions;
+        const nested = this.nest(instructions);
+        return nested;
+    }
+
+    nest(instructions) {
+        const base = {type: 'block', instructions: []};
+        const stack = [base];
+        for(let i = 0; i < instructions.length; i++) {
+            let inst = instructions[i];
+            stack[stack.length-1].instructions.push(inst);
+            if(['block', 'loop'].includes(inst.op)) {
+                inst.instructions = [];
+                stack.push(inst);
+            }
+            if(inst.op === 'if') {
+                inst.true = {type: 'true', instructions: []};
+                stack.push(inst.true);
+            }
+            if(inst.op === 'else') {
+                stack.pop();
+                const insts = stack[stack.length-1].instructions;
+                inst = insts[insts.length-1];
+                inst.false = {type: 'false', instructions: []};
+                stack.push(inst.false);
+            }
+            if(depths[inst.op] === -1) {
+                stack.pop();
+            }
+        }
+        return base;
     }
 }
