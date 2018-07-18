@@ -5,11 +5,11 @@ export default {
     '0x00': notImplemented,
     '0x01': r => ({ op: 'nop' }),
     '0x02': r => ({ op: 'block', type: r.readVarUint() }),
-    '0x03': notImplemented,
+    '0x03': r => ({ op: 'loop', type: r.readVarUint() }),
     '0x04': r => ({ op: 'if', type: r.readVarInt() }),
     '0x05': notImplemented,
     '0x0b': r => ({ op: 'end' }),
-    '0x0c': notImplemented,
+    '0x0c': r => ({ op: 'br', depth: r.readVarUint() }),
     '0x0d': notImplemented,
     '0x0e': notImplemented,
     '0x0f': r => ({ op: 'return' }),
@@ -63,7 +63,7 @@ export default {
     '0x44': r => ({ op: 'f64.const', value: r.getFloat64() }),
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#comparison-operators-described-here
-    '0x45': notImplemented,
+    '0x45': r => ({ op: 'i32.eqz' }),
     '0x46': r => ({ op: 'i32.eq' }),
     '0x47': r => ({ op: 'i32.ne' }),
     '0x48': r => ({ op: 'i32.lt_s' }),

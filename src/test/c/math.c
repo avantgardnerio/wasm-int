@@ -1,3 +1,11 @@
+int pow(int x, int y) {
+    int z = 1;
+    for(int i = 0; i < y; i++) {
+        z *= x;
+    }
+    return z;
+}
+
 int i32add(int a, int b) {
   return a + b;
 }
