@@ -9,16 +9,30 @@ const depths = {
     'block': 1,
     'loop': 1,
     'end': -1
-}
+};
+
+const modules = {
+   env: {
+       memoryBase: 1024,
+       tableBase: 0,
+       STACKTOP: 2080,
+       STACK_MAX: 5244960
+   }
+};
 
 export default class WasmInterpreter {
     constructor(module) {
         this.module = module;
         this.stack = [];
         this.globals = new Array(module.imports.globals.length + module.globals.length);
+        for(let i = 0; i < module.imports.globals.length; i++) {
+            const global = module.imports.globals[i];
+            const initVal = modules[global.module][global.field];
+            this.globals[i] = initVal;
+        }
         for (let i = 0; i < module.globals.length; i++) {
             const global = module.globals[i];
-            const initVal = this.exec(global.initExpr);
+            const initVal = this.exec(global.initExpr, [], undefined, this.globals);
             this.globals[i + module.imports.globals.length] = initVal;
         }
     }
