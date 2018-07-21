@@ -14,3 +14,5 @@ package-lock.json
 # emscripten
 *.wasm
 *.wat
+math.js
+math.html

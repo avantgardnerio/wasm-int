@@ -28,6 +28,11 @@ jasmine.env.describe('WasmParser', () => {
         console.log(`\n----- parsed wasm in ${new Date().getTime() - compiled}ms`);
     });
 
+    jasmine.env.it('should loop and break', () => {
+        const result = interpreter.invoke('_pow', 3, 3);
+        expect(result).toEqual(27);
+    });
+
     jasmine.env.it('should add int32s', () => {
         const result = interpreter.invoke('_i32add', 3, 5);
         expect(result).toEqual(8);

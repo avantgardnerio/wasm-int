@@ -10,12 +10,12 @@ export default {
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#control-flow-operators-described-here
     'unreachable': notImplemented,
     'nop': notImplemented,
-    'block': notImplemented,
-    'loop': notImplemented,
+    // 'block' handled in WasmInterpreter
+    // 'loop' handled in WasmInterpreter
     // 'if' handled in WasmInterpreter
-    'else': notImplemented,
+    // 'else' handled in WasmInterpreter
     // 'end' handled in WasmInterpreter
-    'br': notImplemented,
+    // 'br' handled in WasmInterpreter
     'br_if': notImplemented,
     'br_table': notImplemented,
     // 'return' handled in WasmInterpreter
@@ -29,11 +29,23 @@ export default {
     'select': notImplemented,
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#variable-access-described-here
-    'get_local': (i, s, l, g) => s.push(l[i.localIndex]),
-    'set_local': (i, s, l, g) => l[i.localIndex] = s.pop(),
+    'get_local': (i, s, l, g) => {
+        const a = l[i.localIndex];
+        console.log(`get_local $l${i.localIndex} == ${a}`);
+        s.push(a);
+    },
+    'set_local': (i, s, l, g) => {
+        const a = s.pop();
+        console.log(`set_local $l${i.localIndex}=${a}`);
+        l[i.localIndex] = a;
+    },
     'tee_local': notImplemented,
     'get_global': (i, s, l, g) => s.push(g[i.globalIndex]),
-    'set_global': (i, s, l, g) => g[i.globalIndex] = s.pop(),
+    'set_global': (i, s, l, g) => {
+        const a = s.pop();
+        console.log(`set_global $g${i.globalIndex}=${a}`);
+        g[i.globalIndex] = a;
+    },
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#memory-related-operators-described-here
     'i32.load': notImplemented,
@@ -69,17 +81,25 @@ export default {
     'f64.const': notImplemented,
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#comparison-operators-described-here
-    'i32.eqz': notImplemented,
+    'i32.eqz': (i, s, l, g) => {
+        const a = s.pop();
+        console.log('i32.eqz', a);
+        s.push(a === 0 ? 1 : 0)
+    },
     'i32.eq': (i, s, l, g) => s.push(s.pop() === s.pop() ? 1 : 0),
     'i32.ne': (i, s, l, g) => s.push(s.pop() === s.pop() ? 0 : 1),
-    'i32.lt_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a < b) },
-    'i32.lt_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a < b) },
-    'i32.gt_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a > b) },
-    'i32.gt_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a > b) },
-    'i32.le_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a <= b) },
-    'i32.le_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a <= b) },
-    'i32.ge_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a >= b) },
-    'i32.ge_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a >= b) },
+    'i32.lt_s': (i, s, l, g) => {
+        const [b, a] = [s.pop(), s.pop()];
+        console.log('int32.lt_s', a, b, a < b ? 1 : 0);
+        s.push(a < b ? 1 : 0)
+    },
+    'i32.lt_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a < b ? 1 : 0) },
+    'i32.gt_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a > b ? 1 : 0) },
+    'i32.gt_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a > b ? 1 : 0) },
+    'i32.le_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a <= b ? 1 : 0) },
+    'i32.le_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a <= b ? 1 : 0) },
+    'i32.ge_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a >= b ? 1 : 0) },
+    'i32.ge_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a >= b ? 1 : 0) },
 
     'i64.eqz': notImplemented,
     'i64.eq': notImplemented,
@@ -113,7 +133,12 @@ export default {
     'i32.popcnt': notImplemented,
     'i32.add': (i, s, l, g) => s.push(s.pop() + s.pop()),
     'i32.sub': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a - b) },
-    'i32.mul': (i, s, l, g) => s.push(s.pop() * s.pop()),
+    'i32.mul': (i, s, l, g) => {
+        const [b, a] = [s.pop(), s.pop()];
+        const c = a * b;
+        console.log(`i32.mul ${c}=${a}*${b}`);
+        s.push(c);
+    },
     'i32.div_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a / b) },
     'i32.div_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a / b) },
     'i32.rem_s': notImplemented,
