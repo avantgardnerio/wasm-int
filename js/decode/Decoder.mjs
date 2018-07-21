@@ -46,14 +46,14 @@ export default class Decoder {
                 stack.push(inst);
             }
             if(inst.op === 'if') {
-                inst.true = {type: 'true', instructions: []};
+                inst.true = {op: 'if.true', instructions: []};
                 stack.push(inst.true);
             }
             if(inst.op === 'else') {
                 stack.pop();
                 const insts = stack[stack.length-1].instructions;
                 inst = insts[insts.length-1];
-                inst.false = {type: 'false', instructions: []};
+                inst.false = {op: 'if.false', instructions: []};
                 stack.push(inst.false);
             }
             if(depths[inst.op] === -1) {

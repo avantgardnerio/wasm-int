@@ -30,7 +30,11 @@ export default {
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#variable-access-described-here
     'get_local': (i, s, l, g) => s.push(l[i.localIndex]),
-    'set_local': (i, s, l, g) => l[i.localIndex] = s.pop(),
+    'set_local': (i, s, l, g) => {
+        const a = s.pop();
+        console.log('set_local', i.localIndex, a);
+        l[i.localIndex] = a;
+    },
     'tee_local': notImplemented,
     'get_global': (i, s, l, g) => s.push(g[i.globalIndex]),
     'set_global': (i, s, l, g) => g[i.globalIndex] = s.pop(),
@@ -69,17 +73,25 @@ export default {
     'f64.const': notImplemented,
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#comparison-operators-described-here
-    'i32.eqz': (i, s, l, g) => s.push(s.pop() === 0 ? 1 : 0),
+    'i32.eqz': (i, s, l, g) => {
+        const a = s.pop();
+        console.log('i32.eqz', a);
+        s.push(a === 0 ? 1 : 0)
+    },
     'i32.eq': (i, s, l, g) => s.push(s.pop() === s.pop() ? 1 : 0),
     'i32.ne': (i, s, l, g) => s.push(s.pop() === s.pop() ? 0 : 1),
-    'i32.lt_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a < b) },
-    'i32.lt_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a < b) },
-    'i32.gt_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a > b) },
-    'i32.gt_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a > b) },
-    'i32.le_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a <= b) },
-    'i32.le_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a <= b) },
-    'i32.ge_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a >= b) },
-    'i32.ge_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a >= b) },
+    'i32.lt_s': (i, s, l, g) => {
+        const [b, a] = [s.pop(), s.pop()];
+        console.log('int32.lt_s', a, b, a < b ? 1 : 0);
+        s.push(a < b ? 1 : 0)
+    },
+    'i32.lt_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a < b ? 1 : 0) },
+    'i32.gt_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a > b ? 1 : 0) },
+    'i32.gt_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a > b ? 1 : 0) },
+    'i32.le_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a <= b ? 1 : 0) },
+    'i32.le_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a <= b ? 1 : 0) },
+    'i32.ge_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a >= b ? 1 : 0) },
+    'i32.ge_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a >= b ? 1 : 0) },
 
     'i64.eqz': notImplemented,
     'i64.eq': notImplemented,
