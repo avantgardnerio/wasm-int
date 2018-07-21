@@ -10,12 +10,12 @@ export default {
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#control-flow-operators-described-here
     'unreachable': notImplemented,
     'nop': notImplemented,
-    'block': notImplemented,
-    'loop': notImplemented,
+    // 'block' handled in WasmInterpreter
+    // 'loop' handled in WasmInterpreter
     // 'if' handled in WasmInterpreter
-    'else': notImplemented,
+    // 'else' handled in WasmInterpreter
     // 'end' handled in WasmInterpreter
-    'br': notImplemented,
+    // 'br' handled in WasmInterpreter
     'br_if': notImplemented,
     'br_table': notImplemented,
     // 'return' handled in WasmInterpreter
@@ -69,7 +69,7 @@ export default {
     'f64.const': notImplemented,
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#comparison-operators-described-here
-    'i32.eqz': notImplemented,
+    'i32.eqz': (i, s, l, g) => s.push(s.pop() === 0 ? 1 : 0),
     'i32.eq': (i, s, l, g) => s.push(s.pop() === s.pop() ? 1 : 0),
     'i32.ne': (i, s, l, g) => s.push(s.pop() === s.pop() ? 0 : 1),
     'i32.lt_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a < b) },

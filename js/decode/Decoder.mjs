@@ -36,7 +36,7 @@ export default class Decoder {
     }
 
     nest(instructions) {
-        const base = {type: 'block', instructions: []};
+        const base = {op: 'block', instructions: []};
         const stack = [base];
         for(let i = 0; i < instructions.length; i++) {
             let inst = instructions[i];
