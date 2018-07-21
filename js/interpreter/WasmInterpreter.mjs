@@ -68,7 +68,9 @@ export default class WasmInterpreter {
                     break;
                 case 'return':
                     console.log('return');
-                    return stack.pop();
+                    const res = stack.pop();
+                    this.callStack = [];
+                    return res;
                 case 'call':
                     throw new Error('TODO');
                 case 'block':
@@ -140,7 +142,7 @@ export default class WasmInterpreter {
                 default:
                     const inst = instructions[op.op];
                     if (!inst) throw new Error('Unknown opcode: ' + op.op);
-                    console.log('execute ', op.op);
+                    //console.log('execute ', op.op);
                     try {
                         inst(op, stack, locals, globals);
                     } catch(ex) {

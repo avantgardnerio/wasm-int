@@ -29,15 +29,23 @@ export default {
     'select': notImplemented,
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#variable-access-described-here
-    'get_local': (i, s, l, g) => s.push(l[i.localIndex]),
+    'get_local': (i, s, l, g) => {
+        const a = l[i.localIndex];
+        console.log(`get_local $l${i.localIndex} == ${a}`);
+        s.push(a);
+    },
     'set_local': (i, s, l, g) => {
         const a = s.pop();
-        console.log('set_local', i.localIndex, a);
+        console.log(`set_local $l${i.localIndex}=${a}`);
         l[i.localIndex] = a;
     },
     'tee_local': notImplemented,
     'get_global': (i, s, l, g) => s.push(g[i.globalIndex]),
-    'set_global': (i, s, l, g) => g[i.globalIndex] = s.pop(),
+    'set_global': (i, s, l, g) => {
+        const a = s.pop();
+        console.log(`set_global $g${i.globalIndex}=${a}`);
+        g[i.globalIndex] = a;
+    },
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#memory-related-operators-described-here
     'i32.load': notImplemented,
@@ -125,7 +133,12 @@ export default {
     'i32.popcnt': notImplemented,
     'i32.add': (i, s, l, g) => s.push(s.pop() + s.pop()),
     'i32.sub': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a - b) },
-    'i32.mul': (i, s, l, g) => s.push(s.pop() * s.pop()),
+    'i32.mul': (i, s, l, g) => {
+        const [b, a] = [s.pop(), s.pop()];
+        const c = a * b;
+        console.log(`i32.mul ${c}=${a}*${b}`);
+        s.push(c);
+    },
     'i32.div_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a / b) },
     'i32.div_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a / b) },
     'i32.rem_s': notImplemented,
