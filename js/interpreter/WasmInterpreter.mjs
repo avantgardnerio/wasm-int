@@ -86,19 +86,6 @@ export default class WasmInterpreter {
         return result;
     }
 
-    call() {
-        let funcIdx = this.currentInst.functionIndex;
-        if(funcIdx < this.module.imports.functions.length) {
-            throw new Error('TODO: call imported functions');
-        }
-        funcIdx -= this.module.imports.functions.length;
-        const func = this.module.functions[funcIdx];
-        const args = func.signature.parameterTypes.map(t => this.stack.pop()); // TODO: verfify param order on stack
-        const locals = [...args, ...func.body.localVariables.map(v => defaults[v])];
-        console.log(`calling ${func.name} with args: `, args);
-        this.callStack.push({ inst: func.body.code, ip: 0, locals, type: 'call' });
-    }
-
     exec() {
         while (true) {
             switch (this.currentInst.op) {
@@ -141,6 +128,19 @@ export default class WasmInterpreter {
     }
 
     // --------------------------------------- instructions -----------------------------------------------------------
+    call() {
+        let funcIdx = this.currentInst.functionIndex;
+        if(funcIdx < this.module.imports.functions.length) {
+            throw new Error('TODO: call imported functions');
+        }
+        funcIdx -= this.module.imports.functions.length;
+        const func = this.module.functions[funcIdx];
+        const args = func.signature.parameterTypes.map(t => this.stack.pop()); // TODO: verfify param order on stack
+        const locals = [...args, ...func.body.localVariables.map(v => defaults[v])];
+        console.log(`calling ${func.name} with args: `, args);
+        this.callStack.push({ inst: func.body.code, ip: 0, locals, type: 'call' });
+    }
+
     return() {
         console.log('return');
         while(this.frameType !== 'call') {
