@@ -11,6 +11,7 @@ import ImportSection from './section/ImportSection.mjs';
 import ElementSection from './section/ElementSection.mjs';
 
 import denormalize from './denormalizer.mjs';
+import DataSection from "./section/DataSection";
 
 const parsers = [
     FuncSigSection, 
@@ -21,7 +22,8 @@ const parsers = [
     ExportSection,
     CodeSection,
     ImportSection,
-    ElementSection
+    ElementSection,
+    DataSection
 ];
 
 export default class WasmParser {

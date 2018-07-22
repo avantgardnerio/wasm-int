@@ -6,7 +6,7 @@ export default class ElementSection extends Section {
         const section = {
             type: 'Element',
             elements: []
-        }
+        };
         for (let i = 0; i < count; i++) {
             const segment = this.parseElemSegment();
             section.elements.push(segment);

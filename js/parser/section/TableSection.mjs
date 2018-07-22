@@ -7,7 +7,7 @@ export default class TableSection extends Section {
         const table = {
             type: 'Table',
             limits: []
-        }
+        };
         for(let i = 0; i < count; i++) {
             const tableType = this.parseTableType();
             table.limits.push(tableType);
