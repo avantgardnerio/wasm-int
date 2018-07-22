@@ -38,6 +38,7 @@ export default class WasmInterpreter {
         }
     }
 
+    // ------------------------------------- accessors ----------------------------------------------------------------
     get stackFrame() {
         if(this.callStack.length <= 0) return undefined;
         return this.callStack[this.callStack.length-1];
@@ -50,6 +51,17 @@ export default class WasmInterpreter {
 
     get currentInst() {
         return this.instructions[this.stackFrame.ip];
+    }
+
+    // ------------------------------------- public methods -----------------------------------------------------------
+    invoke(functionName, ...args) {
+        const func = this.module.exports.functions[functionName];
+        if (func.signature.parameterTypes.length !== args.length) {
+            throw new Error('Argument length mismatch!');
+        }
+        const locals = [...args, ...func.body.localVariables.map(v => defaults[v])];
+        const result = this.exec(func.body.code, locals);
+        return result;
     }
 
     exec(inst, locals) {
@@ -91,16 +103,6 @@ export default class WasmInterpreter {
             }
             this.stackFrame.ip++;
         }
-    }
-
-    invoke(functionName, ...args) {
-        const func = this.module.exports.functions[functionName];
-        if (func.signature.parameterTypes.length !== args.length) {
-            throw new Error('Argument length mismatch!');
-        }
-        const locals = [...args, ...func.body.localVariables.map(v => defaults[v])];
-        const result = this.exec(func.body.code, locals);
-        return result;
     }
 
     // --------------------------------------- instructions -----------------------------------------------------------
