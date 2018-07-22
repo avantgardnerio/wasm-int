@@ -28,7 +28,7 @@ export default class Decoder {
                 depth += (depths[op.op] || 0);
                 instructions.push(op);
             } catch(ex) {
-                throw new Error('Error running op: ' + key, ex);
+                throw new Error('Error decoding op: ' + key, ex);
             }
         } while(depth >= 0 || opcode !== 0x0B);
         const nested = this.nest(instructions);
