@@ -2,12 +2,12 @@ const notImplemented = () => { throw new Error('Not implemented') };
 
 export default {
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#control-flow-operators-described-here
-    '0x00': notImplemented,
+    '0x00': r => ({ op: 'unreachable' }),
     '0x01': r => ({ op: 'nop' }),
     '0x02': r => ({ op: 'block', type: r.readVarUint() }),
     '0x03': r => ({ op: 'loop', type: r.readVarUint() }),
     '0x04': r => ({ op: 'if', type: r.readVarInt() }),
-    '0x05': notImplemented,
+    '0x05': r => ({ op: 'else' }),
     '0x0b': r => ({ op: 'end' }),
     '0x0c': r => ({ op: 'br', depth: r.readVarUint() }),
     '0x0d': notImplemented,
