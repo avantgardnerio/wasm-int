@@ -24,7 +24,7 @@ jasmine.env.describe('WasmParser', () => {
         const ar = new Uint8Array(file);
         const parser = new WasmParser(ar.buffer, TextDecoder);
         const module = parser.parse();
-        interpreter = new WasmInterpreter(module);
+        interpreter = new WasmInterpreter(module, TextDecoder);
         console.log(`\n----- parsed wasm in ${new Date().getTime() - compiled}ms`);
     });
 
@@ -39,8 +39,9 @@ jasmine.env.describe('WasmParser', () => {
     });
 
     jasmine.env.it('should read strings', () => {
-        const result = interpreter.invoke('_helloWorld');
-        expect(result).toEqual(8);
+        const ptr = interpreter.invoke('_helloWorld');
+        const str = interpreter.readString(ptr);
+        expect(str).toEqual("Hello, world!");
     });
 
     jasmine.env.it('should add int32s', () => {

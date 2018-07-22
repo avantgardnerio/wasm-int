@@ -21,8 +21,10 @@ const modules = {
 };
 
 export default class WasmInterpreter {
-    constructor(module) {
+    constructor(module, TextDecoder) {
         this.module = module;
+        if(TextDecoder) this.textDecoder = new TextDecoder('utf-8');
+
         this.stack = [];
         this.callStack = [];
         this.globals = new Array(module.imports.globals.length + module.globals.length);
@@ -44,7 +46,7 @@ export default class WasmInterpreter {
         const dataEntries = module.data.map(cur => {
             this.callStack.push({ inst: cur.offset, ip: 0, locals: [], type: 'call' });
             const offset = this.exec();
-            return {offset, bytes: cur.bytes}
+            return {offset, bytes: new Uint8Array(cur.bytes)}
         });
         const memSize = dataEntries.reduce((acc, cur) => Math.max(acc, cur.offset + cur.bytes.byteLength), 0);
         this.heap = new Uint8Array(memSize);
@@ -84,6 +86,14 @@ export default class WasmInterpreter {
         this.callStack.push({ inst: func.body.code, ip: 0, locals, type: 'call' });
         const result = this.exec();
         return result;
+    }
+
+    readString(start) {
+        let end = start;
+        while(end < this.heap.byteLength && this.heap[end] !== 0) end++;
+        const bytes = this.heap.slice(start, end);
+        const str = this.textDecoder.decode(bytes);
+        return str;
     }
 
     exec() {
