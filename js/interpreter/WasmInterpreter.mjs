@@ -47,20 +47,23 @@ export default class WasmInterpreter {
         return this.stackFrame.inst.instructions; // TODO: WTF
     }
 
+    get currentInst() {
+        return this.instructions[this.stackFrame.ip];
+    }
+
     exec(inst, stack = [], locals, globals) {
         if(this.callStack.length !== 0) throw new Error('Already executing!');
         this.callStack.push({ inst, ip: 0 });
         while (true) {
-            const op = this.instructions[this.stackFrame.ip];
-            switch (op.op) {
+            switch (this.currentInst.op) {
                 case 'if':
                     if(stack.pop() === 1) {
                         console.log('recurse into true clause of if');
-                        this.callStack.push({inst: op.true, ip: -1});
+                        this.callStack.push({inst: this.currentInst.true, ip: -1});
                     } else {
-                        if(op.false !== undefined) {
+                        if(this.currentInst.false !== undefined) {
                             console.log('recurse into false clause of if');
-                            this.callStack.push({inst: op.false, ip: -1}); // enter else
+                            this.callStack.push({inst: this.currentInst.false, ip: -1}); // enter else
                         } else {
                             console.log('ignoring empty false clause');
                         }
@@ -75,14 +78,14 @@ export default class WasmInterpreter {
                     throw new Error('TODO');
                 case 'block':
                     console.log('recurse into block');
-                    this.callStack.push({inst: op, ip: -1});
+                    this.callStack.push({inst: this.currentInst, ip: -1});
                     break;
                 case 'loop':
                     console.log('begin loop');
-                    this.callStack.push({inst: op, ip: -1});
+                    this.callStack.push({inst: this.currentInst, ip: -1});
                     break;
                 case 'br':
-                    let depth = op.depth;
+                    let depth = this.currentInst.depth;
                     console.log('break depth=', depth);
                     while(depth >= 0) {
                         console.log('break from ', this.stackFrame.inst.op);
@@ -140,13 +143,13 @@ export default class WasmInterpreter {
                     }
                     break;
                 default:
-                    const inst = instructions[op.op];
-                    if (!inst) throw new Error('Unknown opcode: ' + op.op);
+                    const inst = instructions[this.currentInst.op];
+                    if (!inst) throw new Error('Unknown opcode: ' + this.currentInst.op);
                     //console.log('execute ', op.op);
                     try {
-                        inst(op, stack, locals, globals);
+                        inst(this.currentInst, stack, locals, globals);
                     } catch(ex) {
-                        throw new Error('Error running op: ' + op.op, ex);
+                        throw new Error('Error running op: ' + this.currentInst.op, ex);
                     }
             }
             this.stackFrame.ip++;
