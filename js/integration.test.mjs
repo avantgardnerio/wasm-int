@@ -38,6 +38,11 @@ jasmine.env.describe('WasmParser', () => {
         expect(result).toEqual(8);
     });
 
+    jasmine.env.it('should read strings', () => {
+        const result = interpreter.invoke('_helloWorld');
+        expect(result).toEqual(8);
+    });
+
     jasmine.env.it('should add int32s', () => {
         const result = interpreter.invoke('_i32add', 3, 5);
         expect(result).toEqual(8);

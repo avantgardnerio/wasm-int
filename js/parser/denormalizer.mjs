@@ -7,6 +7,7 @@ const denormalize = (module) => {
     const types = module.sections.filter(s => s.type === 'Types');
     const imports = module.sections.filter(s => s.type === 'Import');
     const globals = module.sections.filter(s => s.type === 'Global');
+    const data = module.sections.filter(s => s.type === 'Data');
 
     if(exports.length !== 1) throw new Error('Expected 1 Export section!');
     if(funcIdxs.length !== 1) throw new Error('Expected 1 Function section!');
@@ -14,6 +15,7 @@ const denormalize = (module) => {
     if(types.length !== 1) throw new Error('Expected 1 Types section!');
     if(imports.length !== 1) throw new Error('Expected 1 Import section!');
     if(globals.length !== 1) throw new Error('Expected 1 Global section!');
+    if(data.length > 1) throw new Error('Expected only 1 Data section!');
 
     if(bodies.length !== funcIdxs.length) throw new Error('Expected 1 body per function!');
 
@@ -50,6 +52,8 @@ const denormalize = (module) => {
         }
     });
 
+    const dataEntries = data[0].entries.map(e => ({offset: e.offset, bytes: e.bytes}));
+
     const result = {
         imports: {
             globals: importedGlobals,
@@ -59,6 +63,7 @@ const denormalize = (module) => {
             functions: exportedFunctions
         },
         functions,
+        data: dataEntries,
         globals: globalVariables
     };
 
