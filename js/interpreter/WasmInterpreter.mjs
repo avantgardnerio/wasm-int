@@ -21,11 +21,15 @@ const modules = {
 };
 
 export default class WasmInterpreter {
-    constructor(module) {
+    constructor(module, TextDecoder) {
         this.module = module;
+        if(TextDecoder) this.textDecoder = new TextDecoder('utf-8');
+
         this.stack = [];
         this.callStack = [];
         this.globals = new Array(module.imports.globals.length + module.globals.length);
+
+        // globals
         for(let i = 0; i < module.imports.globals.length; i++) {
             const global = module.imports.globals[i];
             const initVal = modules[global.module][global.field];
@@ -33,10 +37,20 @@ export default class WasmInterpreter {
         }
         for (let i = 0; i < module.globals.length; i++) {
             const global = module.globals[i];
-            this.callStack.push({ inst: global.initExpr, ip: 0, locals: undefined, type: 'call' });
+            this.callStack.push({ inst: global.initExpr, ip: 0, locals: [], type: 'call' });
             const initVal = this.exec();
             this.globals[i + module.imports.globals.length] = initVal;
         }
+
+        // data
+        const dataEntries = module.data.map(cur => {
+            this.callStack.push({ inst: cur.offset, ip: 0, locals: [], type: 'call' });
+            const offset = this.exec();
+            return {offset, bytes: new Uint8Array(cur.bytes)}
+        });
+        const memSize = dataEntries.reduce((acc, cur) => Math.max(acc, cur.offset + cur.bytes.byteLength), 0);
+        this.heap = new Uint8Array(memSize);
+        dataEntries.forEach(e => this.heap.set(e.bytes, e.offset));
     }
 
     // ------------------------------------- accessors ----------------------------------------------------------------
@@ -74,17 +88,12 @@ export default class WasmInterpreter {
         return result;
     }
 
-    call() {
-        let funcIdx = this.currentInst.functionIndex;
-        if(funcIdx < this.module.imports.functions.length) {
-            throw new Error('TODO: call imported functions');
-        }
-        funcIdx -= this.module.imports.functions.length;
-        const func = this.module.functions[funcIdx];
-        const args = func.signature.parameterTypes.map(t => this.stack.pop()); // TODO: verfify param order on stack
-        const locals = [...args, ...func.body.localVariables.map(v => defaults[v])];
-        console.log(`calling ${func.name} with args: `, args);
-        this.callStack.push({ inst: func.body.code, ip: 0, locals, type: 'call' });
+    readString(start) {
+        let end = start;
+        while(end < this.heap.byteLength && this.heap[end] !== 0) end++;
+        const bytes = this.heap.slice(start, end);
+        const str = this.textDecoder.decode(bytes);
+        return str;
     }
 
     exec() {
@@ -129,6 +138,19 @@ export default class WasmInterpreter {
     }
 
     // --------------------------------------- instructions -----------------------------------------------------------
+    call() {
+        let funcIdx = this.currentInst.functionIndex;
+        if(funcIdx < this.module.imports.functions.length) {
+            throw new Error('TODO: call imported functions');
+        }
+        funcIdx -= this.module.imports.functions.length;
+        const func = this.module.functions[funcIdx];
+        const args = func.signature.parameterTypes.map(t => this.stack.pop()); // TODO: verfify param order on stack
+        const locals = [...args, ...func.body.localVariables.map(v => defaults[v])];
+        console.log(`calling ${func.name} with args: `, args);
+        this.callStack.push({ inst: func.body.code, ip: 0, locals, type: 'call' });
+    }
+
     return() {
         console.log('return');
         while(this.frameType !== 'call') {

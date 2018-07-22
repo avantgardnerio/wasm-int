@@ -11,6 +11,10 @@ int fib(int n) {
    return fib(n-1) + fib(n-2);
 }
 
+char *helloWorld() {
+    return "Hello, world!";
+}
+
 int i32add(int a, int b) {
   return a + b;
 }
