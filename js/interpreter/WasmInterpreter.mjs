@@ -67,8 +67,7 @@ export default class WasmInterpreter {
                     this.block();
                     break;
                 case 'loop':
-                    console.log('begin loop');
-                    this.callStack.push({inst: this.currentInst, ip: -1});
+                    this.loop();
                     break;
                 case 'br':
                     let depth = this.currentInst.depth;
@@ -177,6 +176,11 @@ export default class WasmInterpreter {
 
     block() {
         console.log('recurse into block');
+        this.callStack.push({inst: this.currentInst, ip: -1});
+    }
+
+    loop() {
+        console.log('begin loop');
         this.callStack.push({inst: this.currentInst, ip: -1});
     }
 }
