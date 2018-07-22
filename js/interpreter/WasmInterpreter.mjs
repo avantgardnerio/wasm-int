@@ -64,8 +64,7 @@ export default class WasmInterpreter {
                 case 'call':
                     throw new Error('TODO');
                 case 'block':
-                    console.log('recurse into block');
-                    this.callStack.push({inst: this.currentInst, ip: -1});
+                    this.block();
                     break;
                 case 'loop':
                     console.log('begin loop');
@@ -174,5 +173,10 @@ export default class WasmInterpreter {
             return;
         }
         console.log('ignoring empty false clause');
+    }
+
+    block() {
+        console.log('recurse into block');
+        this.callStack.push({inst: this.currentInst, ip: -1});
     }
 }
