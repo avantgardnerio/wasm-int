@@ -57,17 +57,7 @@ export default class WasmInterpreter {
         while (true) {
             switch (this.currentInst.op) {
                 case 'if':
-                    if(this.stack.pop() === 1) {
-                        console.log('recurse into true clause of if');
-                        this.callStack.push({inst: this.currentInst.true, ip: -1});
-                    } else {
-                        if(this.currentInst.false !== undefined) {
-                            console.log('recurse into false clause of if');
-                            this.callStack.push({inst: this.currentInst.false, ip: -1}); // enter else
-                        } else {
-                            console.log('ignoring empty false clause');
-                        }
-                    }
+                    this.if();
                     break;
                 case 'return':
                     return this.return();
@@ -171,4 +161,18 @@ export default class WasmInterpreter {
         return res;
     }
 
+    if() {
+        const conditionExprRes = this.stack.pop();
+        if(conditionExprRes === 1) {
+            console.log('recurse into true clause of if');
+            this.callStack.push({inst: this.currentInst.true, ip: -1});
+            return;
+        }
+        if(this.currentInst.false !== undefined) {
+            console.log('recurse into false clause of if');
+            this.callStack.push({inst: this.currentInst.false, ip: -1}); // enter else
+            return;
+        }
+        console.log('ignoring empty false clause');
+    }
 }
