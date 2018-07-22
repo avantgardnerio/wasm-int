@@ -60,7 +60,7 @@ export default class WasmInterpreter {
                     this.if();
                     break;
                 case 'return':
-                    return this.return();
+                    return this.return(); // TODO: recursive function calls
                 case 'call':
                     throw new Error('TODO');
                 case 'block':
@@ -70,34 +70,7 @@ export default class WasmInterpreter {
                     this.loop();
                     break;
                 case 'br':
-                    let depth = this.currentInst.depth;
-                    console.log('break depth=', depth);
-                    while(depth >= 0) {
-                        console.log('break from ', this.stackFrame.inst.op);
-                        switch(this.stackFrame.inst.op) {
-                            case 'if.true':
-                                depth--;
-                                this.callStack.pop();
-                                break;
-                            case 'if.false':
-                                depth--;
-                                this.callStack.pop();
-                                break;
-                            case 'block':
-                                depth--;
-                                this.callStack.pop();
-                                break;
-                            case 'loop':
-                                depth--;
-                                this.stackFrame.ip = -1;
-                                if(depth >= 0) {
-                                    this.callStack.pop();
-                                }
-                                break;
-                            default:
-                                throw new Error('TODO');
-                        }
-                    }
+                    this.br();
                     break;
                 case 'end':
                     switch (this.stackFrame.inst.op) {
@@ -182,5 +155,30 @@ export default class WasmInterpreter {
     loop() {
         console.log('begin loop');
         this.callStack.push({inst: this.currentInst, ip: -1});
+    }
+
+    br() {
+        let depth = this.currentInst.depth;
+        console.log('break depth=', depth);
+        while(depth >= 0) {
+            console.log('break from ', this.stackFrame.inst.op);
+            switch(this.stackFrame.inst.op) {
+                case 'if.true':
+                case 'if.false':
+                case 'block':
+                    depth--;
+                    this.callStack.pop();
+                    break;
+                case 'loop':
+                    depth--;
+                    this.stackFrame.ip = -1;
+                    if(depth >= 0) {
+                        this.callStack.pop();
+                    }
+                    break;
+                default:
+                    throw new Error('TODO');
+            }
+        }
     }
 }
