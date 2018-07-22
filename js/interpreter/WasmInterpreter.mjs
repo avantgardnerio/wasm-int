@@ -44,7 +44,8 @@ export default class WasmInterpreter {
     }
 
     get instructions() {
-        return this.stackFrame.inst.instructions; // TODO: WTF
+        // TODO: inst is clearly a bad name, given inst.instructions
+        return this.stackFrame.inst.instructions;
     }
 
     get currentInst() {
@@ -73,32 +74,7 @@ export default class WasmInterpreter {
                     this.br();
                     break;
                 case 'end':
-                    switch (this.stackFrame.inst.op) {
-                        case 'if.true':
-                            console.log('end if');
-                            this.callStack.pop();
-                            break;
-                        case 'if.false':
-                            console.log('end else');
-                            this.callStack.pop();
-                            break;
-                        case 'block':
-                            console.log('end block');
-                            this.callStack.pop();
-                            if(this.callStack.length === 0) {
-                                return this.stack.pop();
-                            }
-                            break;
-                        case 'loop':
-                            console.log('end loop');
-                            this.callStack.pop();
-                            if(this.callStack.length === 0) {
-                                return this.stack.pop();
-                            }
-                            break;
-                        default:
-                            throw new Error("Can't exit op: " + this.stackFrame.inst.op)
-                    }
+                    this.end();
                     break;
                 default:
                     const inst = instructions[this.currentInst.op];
@@ -109,6 +85,9 @@ export default class WasmInterpreter {
                     } catch(ex) {
                         throw new Error('Error running op: ' + this.currentInst.op, ex);
                     }
+            }
+            if(this.callStack.length === 0) {
+                return this.stack.pop();
             }
             this.stackFrame.ip++;
         }
@@ -179,6 +158,29 @@ export default class WasmInterpreter {
                 default:
                     throw new Error('TODO');
             }
+        }
+    }
+    
+    end() {
+        switch (this.stackFrame.inst.op) {
+            case 'if.true':
+                console.log('end if');
+                this.callStack.pop();
+                break;
+            case 'if.false':
+                console.log('end else');
+                this.callStack.pop();
+                break;
+            case 'block':
+                console.log('end block');
+                this.callStack.pop();
+                break;
+            case 'loop':
+                console.log('end loop');
+                this.callStack.pop();
+                break;
+            default:
+                throw new Error("Can't exit op: " + this.stackFrame.inst.op)
         }
     }
 }
