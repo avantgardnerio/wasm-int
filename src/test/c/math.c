@@ -15,6 +15,12 @@ char *helloWorld() {
     return "Hello, world!";
 }
 
+int strlen(const char *str) {
+    const char *s;
+    for (s = str; *s; ++s);
+    return (s - str);
+}
+
 int i32add(int a, int b) {
   return a + b;
 }
