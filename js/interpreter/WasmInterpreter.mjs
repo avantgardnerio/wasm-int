@@ -26,6 +26,8 @@ export default class WasmInterpreter {
         this.stack = [];
         this.callStack = [];
         this.globals = new Array(module.imports.globals.length + module.globals.length);
+
+        // globals
         for(let i = 0; i < module.imports.globals.length; i++) {
             const global = module.imports.globals[i];
             const initVal = modules[global.module][global.field];
@@ -33,10 +35,20 @@ export default class WasmInterpreter {
         }
         for (let i = 0; i < module.globals.length; i++) {
             const global = module.globals[i];
-            this.callStack.push({ inst: global.initExpr, ip: 0, locals: undefined, type: 'call' });
+            this.callStack.push({ inst: global.initExpr, ip: 0, locals: [], type: 'call' });
             const initVal = this.exec();
             this.globals[i + module.imports.globals.length] = initVal;
         }
+
+        // data
+        const dataEntries = module.data.map(cur => {
+            this.callStack.push({ inst: cur.offset, ip: 0, locals: [], type: 'call' });
+            const offset = this.exec();
+            return {offset, bytes: cur.bytes}
+        });
+        const memSize = dataEntries.reduce((acc, cur) => Math.max(acc, cur.offset + cur.bytes.byteLength), 0);
+        this.heap = new Uint8Array(memSize);
+        dataEntries.forEach(e => this.heap.set(e.bytes, e.offset));
     }
 
     // ------------------------------------- accessors ----------------------------------------------------------------
