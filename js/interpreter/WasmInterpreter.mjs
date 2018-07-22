@@ -147,7 +147,7 @@ export default class WasmInterpreter {
                     if (!inst) throw new Error('Unknown opcode: ' + this.currentInst.op);
                     //console.log('execute ', op.op);
                     try {
-                        inst(this.currentInst, stack, locals, this.globals);
+                        inst(this.currentInst, stack, locals);
                     } catch(ex) {
                         throw new Error('Error running op: ' + this.currentInst.op, ex);
                     }
