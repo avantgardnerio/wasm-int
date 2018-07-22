@@ -90,7 +90,8 @@ export default class WasmInterpreter {
                     this.if();
                     break;
                 case 'return':
-                    return this.return(); // TODO: recursive function calls
+                    this.return();
+                    break;
                 case 'call':
                     this.call();
                     break;
@@ -126,9 +127,7 @@ export default class WasmInterpreter {
     // --------------------------------------- instructions -----------------------------------------------------------
     return() {
         console.log('return');
-        const res = this.stack.pop();
-        this.callStack = [];
-        return res;
+        this.callStack.pop();
     }
 
     if() {
