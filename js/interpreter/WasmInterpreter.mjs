@@ -79,6 +79,7 @@ export default class WasmInterpreter {
         const func = this.module.functions[funcIdx];
         const args = func.signature.parameterTypes.map(t => this.stack.pop()); // TODO: verfify param order on stack
         const locals = [...args, ...func.body.localVariables.map(v => defaults[v])];
+        console.log(`calling ${func.name} with args: `, args);
         this.callStack.push({ inst: func.body.code, ip: 0, locals });
     }
 
