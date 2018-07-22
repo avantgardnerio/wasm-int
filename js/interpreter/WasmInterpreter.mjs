@@ -70,10 +70,7 @@ export default class WasmInterpreter {
                     }
                     break;
                 case 'return':
-                    console.log('return');
-                    const res = this.stack.pop();
-                    this.callStack = [];
-                    return res;
+                    return this.return();
                 case 'call':
                     throw new Error('TODO');
                 case 'block':
@@ -165,4 +162,13 @@ export default class WasmInterpreter {
         const result = this.exec(func.body.code, locals);
         return result;
     }
+
+    // --------------------------------------- instructions -----------------------------------------------------------
+    return() {
+        console.log('return');
+        const res = this.stack.pop();
+        this.callStack = [];
+        return res;
+    }
+
 }
