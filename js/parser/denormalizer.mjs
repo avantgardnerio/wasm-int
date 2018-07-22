@@ -27,17 +27,28 @@ const denormalize = (module) => {
     // https://github.com/WebAssembly/design/blob/master/Modules.md#function-index-space
     // the index space starts at zero with the function imports (if any) 
     // followed by the functions defined within the module.
+    const funcMap = {};
     const exportedFunctions = exports[0].exports
         .filter(e => e.kind === 'Function')
         .map(f => {
-            const realIdx = f.index - importedFunctions.length;
-            const sigIdx = funcIdxs[0].functionSignatureIndices[realIdx];
+            const bodyIdx = f.index - importedFunctions.length;
+            const sigIdx = funcIdxs[0].functionSignatureIndices[bodyIdx];
+            funcMap[bodyIdx] = f.field;
             return {
                 name: f.field,
-                body: bodies[0].functions[realIdx],
+                body: bodies[0].functions[bodyIdx],
                 signature: types[0].functionSignatures[sigIdx]
             }
         }).reduce((acc, cur) => ({...acc, [cur.name]: cur}), {});
+
+    const functions = funcIdxs[0].functionSignatureIndices.map((sigIdx, bodyIdx) => {
+        const name = funcMap[bodyIdx] || '$' + bodyIdx;
+        return {
+            name,
+            body: bodies[0].functions[bodyIdx],
+            signature: types[0].functionSignatures[sigIdx]
+        }
+    });
 
     const result = {
         imports: {
@@ -47,10 +58,11 @@ const denormalize = (module) => {
         exports: {
             functions: exportedFunctions
         },
+        functions,
         globals: globalVariables
     };
 
     return result;
-}
+};
 
 export default denormalize;

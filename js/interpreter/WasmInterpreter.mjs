@@ -64,6 +64,16 @@ export default class WasmInterpreter {
         return result;
     }
 
+    call() {
+        let funcIdx = this.currentInst.functionIndex;
+        if(funcIdx < this.module.imports.functions.length) {
+            throw new Error('TODO: call imported functions');
+        }
+        funcIdx -= this.module.imports.functions.length;
+        const func = this.module.functions[funcIdx];
+        throw new Error('TODO');
+    }
+
     exec(inst, locals) {
         if(this.callStack.length !== 0) throw new Error('Already executing!');
         this.callStack.push({ inst, ip: 0 });
@@ -75,7 +85,8 @@ export default class WasmInterpreter {
                 case 'return':
                     return this.return(); // TODO: recursive function calls
                 case 'call':
-                    throw new Error('TODO');
+                    this.call();
+                    break;
                 case 'block':
                     this.block();
                     break;
