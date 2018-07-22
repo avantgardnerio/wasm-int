@@ -33,7 +33,8 @@ export default class WasmInterpreter {
         }
         for (let i = 0; i < module.globals.length; i++) {
             const global = module.globals[i];
-            const initVal = this.exec(global.initExpr, undefined);
+            this.callStack.push({ inst: global.initExpr, ip: 0, locals: undefined });
+            const initVal = this.exec();
             this.globals[i + module.imports.globals.length] = initVal;
         }
     }
@@ -49,6 +50,10 @@ export default class WasmInterpreter {
         return this.stackFrame.inst.instructions;
     }
 
+    get locals() {
+        return this.stackFrame.locals;
+    }
+
     get currentInst() {
         return this.instructions[this.stackFrame.ip];
     }
@@ -60,7 +65,8 @@ export default class WasmInterpreter {
             throw new Error('Argument length mismatch!');
         }
         const locals = [...args, ...func.body.localVariables.map(v => defaults[v])];
-        const result = this.exec(func.body.code, locals);
+        this.callStack.push({ inst: func.body.code, ip: 0, locals });
+        const result = this.exec();
         return result;
     }
 
@@ -71,12 +77,12 @@ export default class WasmInterpreter {
         }
         funcIdx -= this.module.imports.functions.length;
         const func = this.module.functions[funcIdx];
-        throw new Error('TODO');
+        const args = func.signature.parameterTypes.map(t => this.stack.pop()); // TODO: verfify param order on stack
+        const locals = [...args, ...func.body.localVariables.map(v => defaults[v])];
+        this.callStack.push({ inst: func.body.code, ip: 0, locals });
     }
 
-    exec(inst, locals) {
-        if(this.callStack.length !== 0) throw new Error('Already executing!');
-        this.callStack.push({ inst, ip: 0 });
+    exec() {
         while (true) {
             switch (this.currentInst.op) {
                 case 'if':
@@ -104,7 +110,7 @@ export default class WasmInterpreter {
                     if (!inst) throw new Error('Unknown opcode: ' + this.currentInst.op);
                     //console.log('execute ', op.op);
                     try {
-                        inst(this.currentInst, this.stack, locals, this.globals);
+                        inst(this.currentInst, this.stack, this.locals, this.globals);
                     } catch(ex) {
                         throw new Error('Error running op: ' + this.currentInst.op, ex);
                     }
@@ -128,12 +134,12 @@ export default class WasmInterpreter {
         const conditionExprRes = this.stack.pop();
         if(conditionExprRes === 1) {
             console.log('recurse into true clause of if');
-            this.callStack.push({inst: this.currentInst.true, ip: -1});
+            this.callStack.push({inst: this.currentInst.true, ip: -1, locals: this.locals});
             return;
         }
         if(this.currentInst.false !== undefined) {
             console.log('recurse into false clause of if');
-            this.callStack.push({inst: this.currentInst.false, ip: -1}); // enter else
+            this.callStack.push({inst: this.currentInst.false, ip: -1, locals: this.locals}); // enter else
             return;
         }
         console.log('ignoring empty false clause');
@@ -141,12 +147,12 @@ export default class WasmInterpreter {
 
     block() {
         console.log('recurse into block');
-        this.callStack.push({inst: this.currentInst, ip: -1});
+        this.callStack.push({inst: this.currentInst, ip: -1, locals: this.locals});
     }
 
     loop() {
         console.log('begin loop');
-        this.callStack.push({inst: this.currentInst, ip: -1});
+        this.callStack.push({inst: this.currentInst, ip: -1, locals: this.locals});
     }
 
     br() {
