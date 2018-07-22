@@ -33,7 +33,7 @@ export default class WasmInterpreter {
         }
         for (let i = 0; i < module.globals.length; i++) {
             const global = module.globals[i];
-            const initVal = this.exec(global.initExpr, [], undefined);
+            const initVal = this.exec(global.initExpr, undefined);
             this.globals[i + module.imports.globals.length] = initVal;
         }
     }
@@ -51,13 +51,13 @@ export default class WasmInterpreter {
         return this.instructions[this.stackFrame.ip];
     }
 
-    exec(inst, stack = [], locals) {
+    exec(inst, locals) {
         if(this.callStack.length !== 0) throw new Error('Already executing!');
         this.callStack.push({ inst, ip: 0 });
         while (true) {
             switch (this.currentInst.op) {
                 case 'if':
-                    if(stack.pop() === 1) {
+                    if(this.stack.pop() === 1) {
                         console.log('recurse into true clause of if');
                         this.callStack.push({inst: this.currentInst.true, ip: -1});
                     } else {
@@ -71,7 +71,7 @@ export default class WasmInterpreter {
                     break;
                 case 'return':
                     console.log('return');
-                    const res = stack.pop();
+                    const res = this.stack.pop();
                     this.callStack = [];
                     return res;
                 case 'call':
@@ -147,7 +147,7 @@ export default class WasmInterpreter {
                     if (!inst) throw new Error('Unknown opcode: ' + this.currentInst.op);
                     //console.log('execute ', op.op);
                     try {
-                        inst(this.currentInst, stack, locals);
+                        inst(this.currentInst, this.stack, locals, this.globals);
                     } catch(ex) {
                         throw new Error('Error running op: ' + this.currentInst.op, ex);
                     }
@@ -162,7 +162,7 @@ export default class WasmInterpreter {
             throw new Error('Argument length mismatch!');
         }
         const locals = [...args, ...func.body.localVariables.map(v => defaults[v])];
-        const result = this.exec(func.body.code, this.stack, locals);
+        const result = this.exec(func.body.code, locals);
         return result;
     }
 }
