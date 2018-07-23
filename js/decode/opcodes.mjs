@@ -32,7 +32,7 @@ export default {
     '0x24': r => ({op: 'set_global', globalIndex: r.readVarUint()}),
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#memory-related-operators-described-here
-    '0x28': notImplemented,
+    '0x28': r => ({op: 'i32.load', flags: r.readVarUint(), offset: r.readVarUint()}),
     '0x29': notImplemented,
     '0x2a': notImplemented,
     '0x2b': notImplemented,

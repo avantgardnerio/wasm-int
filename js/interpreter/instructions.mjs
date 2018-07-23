@@ -48,7 +48,10 @@ export default {
     },
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#memory-related-operators-described-here
-    'i32.load': notImplemented,
+    'i32.load': (i, s, l, g) => {
+        console.log(`i32.load`);
+        throw new Error('TODO');
+    },
     'i64.load': notImplemented,
     'f32.load': notImplemented,
     'f64.load': notImplemented,
