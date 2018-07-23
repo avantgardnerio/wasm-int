@@ -16,7 +16,14 @@ const modules = {
        memoryBase: 1024,
        tableBase: 0,
        STACKTOP: 2080,
-       STACK_MAX: 5244960
+       STACK_MAX: 5244960,
+       exports: {
+           functions: {
+               _llvm_stacksave: (t) => {
+                   console.log(t);
+               }
+           }
+       }
    }
 };
 
@@ -141,6 +148,14 @@ export default class WasmInterpreter {
     call() {
         let funcIdx = this.currentInst.functionIndex;
         if(funcIdx < this.module.imports.functions.length) {
+            const funcImport = this.module.imports.functions[funcIdx];
+            const module = modules[funcImport.module];
+            const importedFunc = module.exports.functions[funcImport.field];
+            if(typeof importedFunc === 'function') {
+
+            } else {
+
+            }
             throw new Error('TODO: call imported functions');
         }
         funcIdx -= this.module.imports.functions.length;

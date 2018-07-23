@@ -13,8 +13,14 @@ jasmine.env.describe('WasmParser', () => {
     jasmine.env.beforeAll(() => {
         const start = new Date().getTime();
         const filename = 'math';
-        // -s SIDE_MODULE=1
-        const cmd = `emcc src/test/c/${filename}.c -O0 -s ONLY_MY_CODE=1 -s LINKABLE=1 -s EXPORT_ALL=1 -o ${filename}.html`;
+        const options = [
+            '-O0',
+            '-s ONLY_MY_CODE=1',
+            '-s LINKABLE=1',
+            '-s EXPORT_ALL=1',
+            // -s SIDE_MODULE=1
+        ];
+        const cmd = `emcc src/test/c/${filename}.c ${options.join(' ')} -o ${filename}.html`;
         console.log(`\n----- running: ${cmd}`);
         execSync(cmd);
         const compiled = new Date().getTime();

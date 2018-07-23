@@ -1,3 +1,4 @@
+/*
 int pow(int x, int y) {
     int z = 1;
     for(int i = 0; i < y; i++) {
@@ -5,6 +6,7 @@ int pow(int x, int y) {
     }
     return z;
 }
+*/
 
 int fib(int n) {
    if (n <= 1) return n;
@@ -15,11 +17,13 @@ char *helloWorld() {
     return "Hello, world!";
 }
 
+/*
 int strlen(const char *str) {
     const char *s;
     for (s = str; *s; ++s);
     return (s - str);
 }
+*/
 
 int stackTest(int sz) {
     char str[sz];
