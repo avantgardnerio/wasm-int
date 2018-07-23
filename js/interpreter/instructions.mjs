@@ -4,7 +4,8 @@ const notImplemented = () => { throw new Error('Not implemented') };
     i = instruction,
     s = stack,
     l = locals,
-    g = globals
+    g = globals,
+    m = memory
 */
 export default {
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#control-flow-operators-described-here
@@ -48,9 +49,11 @@ export default {
     },
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#memory-related-operators-described-here
-    'i32.load': (i, s, l, g) => {
-        console.log(`i32.load`);
-        throw new Error('TODO');
+    'i32.load': (i, s, l, g, m) => {
+        const ptr = s.pop() + i.offset; // TODO: align to i.flags
+        const val =  m.getInt32(ptr);
+        console.log(`i32.load ${val} == mem[${ptr}]`);
+        s.push(val);
     },
     'i64.load': notImplemented,
     'f32.load': notImplemented,
@@ -65,7 +68,12 @@ export default {
     'i64.load16_u': notImplemented,
     'i64.load32_s': notImplemented,
     'i64.load32_u': notImplemented,
-    'i32.store': notImplemented,
+    'i32.store': (i, s, l, g, m) => {
+        const val = s.pop();
+        const ptr = s.pop() + i.offset; // TODO: align to i.flags
+        console.log(`i32.store mem[${ptr}] = ${val}`);
+        val < 0 ? m.setInt32(ptr, val) : m.setUint32(ptr, val);
+    },
     'i64.store': notImplemented,
     'f32.store': notImplemented,
     'f64.store': notImplemented,

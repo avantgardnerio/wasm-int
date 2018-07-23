@@ -46,7 +46,7 @@ export default {
     '0x33': notImplemented,
     '0x34': notImplemented,
     '0x35': notImplemented,
-    '0x36': notImplemented,
+    '0x36': r => ({op: 'i32.store', flags: r.readVarUint(), offset: r.readVarUint()}),
     '0x37': notImplemented,
     '0x38': notImplemented,
     '0x39': notImplemented,

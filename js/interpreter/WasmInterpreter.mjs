@@ -11,6 +11,8 @@ const depths = {
     'end': -1
 };
 
+const PG_SIZE = 64 * 1024; // https://webassembly.github.io/spec/core/exec/runtime.html#memory-instances
+
 const modules = {
    env: {
        memoryBase: 1024,
@@ -55,9 +57,10 @@ export default class WasmInterpreter {
             const offset = this.exec();
             return {offset, bytes: new Uint8Array(cur.bytes)}
         });
-        const memSize = dataEntries.reduce((acc, cur) => Math.max(acc, cur.offset + cur.bytes.byteLength), 0);
-        this.heap = new Uint8Array(memSize);
-        dataEntries.forEach(e => this.heap.set(e.bytes, e.offset));
+        const memSize = dataEntries.reduce((acc, cur) => Math.max(acc, cur.offset + cur.bytes.byteLength), 0) || 1;
+        this.memory = new Uint8Array(Math.ceil(memSize / PG_SIZE) * PG_SIZE);
+        this.memView = new DataView(this.memory.buffer);
+        dataEntries.forEach(e => this.memory.set(e.bytes, e.offset));
     }
 
     // ------------------------------------- accessors ----------------------------------------------------------------
@@ -97,8 +100,8 @@ export default class WasmInterpreter {
 
     readString(start) {
         let end = start;
-        while(end < this.heap.byteLength && this.heap[end] !== 0) end++;
-        const bytes = this.heap.slice(start, end);
+        while(end < this.memory.byteLength && this.memory[end] !== 0) end++;
+        const bytes = this.memory.slice(start, end);
         const str = this.textDecoder.decode(bytes);
         return str;
     }
@@ -132,7 +135,7 @@ export default class WasmInterpreter {
                     if (!inst) throw new Error('Unknown opcode: ' + this.currentInst.op);
                     //console.log('execute ', op.op);
                     try {
-                        inst(this.currentInst, this.stack, this.locals, this.globals);
+                        inst(this.currentInst, this.stack, this.locals, this.globals, this.memView);
                     } catch(ex) {
                         throw new Error('Error running op: ' + this.currentInst.op, ex);
                     }

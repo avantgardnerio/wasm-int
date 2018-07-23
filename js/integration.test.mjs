@@ -34,17 +34,17 @@ jasmine.env.describe('WasmParser', () => {
         console.log(`\n----- parsed wasm in ${new Date().getTime() - compiled}ms`);
     });
 
-    jasmine.env.xit('should loop and break', () => {
+    jasmine.env.it('should loop and break', () => {
         const result = interpreter.invoke('_pow', 3, 3);
         expect(result).toEqual(27);
     });
 
-    jasmine.env.xit('should handle recursive function calls', () => {
+    jasmine.env.it('should handle recursive function calls', () => {
         const result = interpreter.invoke('_fib', 6);
         expect(result).toEqual(8);
     });
 
-    jasmine.env.xit('should read strings', () => {
+    jasmine.env.it('should read strings', () => {
         const ptr = interpreter.invoke('_helloWorld');
         const str = interpreter.readString(ptr);
         expect(str).toEqual("Hello, world!");
@@ -52,98 +52,98 @@ jasmine.env.describe('WasmParser', () => {
 
     jasmine.env.it('should allocate on stack', () => {
         const res = interpreter.invoke('_stackTest');
-        expect(res).toEqual(10);
+        expect(res).toEqual(4);
     });
 
-    jasmine.env.xit('should add int32s', () => {
+    jasmine.env.it('should add int32s', () => {
         const result = interpreter.invoke('_i32add', 3, 5);
         expect(result).toEqual(8);
     });
 
-    jasmine.env.xit('should subtract int32s', () => {
+    jasmine.env.it('should subtract int32s', () => {
         const result = interpreter.invoke('_i32sub', 11, 7);
         expect(result).toEqual(4);
     });
 
-    jasmine.env.xit('should multiply int32s', () => {
+    jasmine.env.it('should multiply int32s', () => {
         const result = interpreter.invoke('_i32mul', 3, 4);
         expect(result).toEqual(12);
     });
 
-    jasmine.env.xit('should divide int32s', () => {
+    jasmine.env.it('should divide int32s', () => {
         const result = interpreter.invoke('_i32div_s', 1, 2);
         expect(result).toEqual(0);
     });
 
-    jasmine.env.xit('should divide int32u', () => {
+    jasmine.env.it('should divide int32u', () => {
         const result = interpreter.invoke('_i32div_u', 5, 2);
         expect(result).toEqual(2);
     });
 
-    jasmine.env.xit('should or int32u', () => {
+    jasmine.env.it('should or int32u', () => {
         const result = interpreter.invoke('_i32or', 1, 2);
         expect(result).toEqual(3);
     });
 
-    jasmine.env.xit('should xor int32u', () => {
+    jasmine.env.it('should xor int32u', () => {
         const result = interpreter.invoke('_i32xor', 6, 3);
         expect(result).toEqual(5);
     });
 
-    jasmine.env.xit('should shift left int32', () => {
+    jasmine.env.it('should shift left int32', () => {
         const result = interpreter.invoke('_i32shl', 1, 2);
         expect(result).toEqual(4);
     });
 
-    jasmine.env.xit('should eq int32', () => {
+    jasmine.env.it('should eq int32', () => {
         expect(interpreter.invoke('_i32eq', 1, 2)).toEqual(0);
         expect(interpreter.invoke('_i32eq', 1, 1)).toEqual(1);
     });
 
-    jasmine.env.xit('should ne int32', () => {
+    jasmine.env.it('should ne int32', () => {
         expect(interpreter.invoke('_i32ne', 1, 2)).toEqual(1);
         expect(interpreter.invoke('_i32ne', 1, 1)).toEqual(0);
     });
 
-    jasmine.env.xit('should lt int32', () => {
+    jasmine.env.it('should lt int32', () => {
         expect(interpreter.invoke('_i32lt_s', 1, 2)).toEqual(1);
         expect(interpreter.invoke('_i32lt_s', 1, 1)).toEqual(0);
     });
 
-    jasmine.env.xit('should lt int32_u', () => {
+    jasmine.env.it('should lt int32_u', () => {
         expect(interpreter.invoke('_i32lt_u', 1, 2)).toEqual(1);
         expect(interpreter.invoke('_i32lt_u', 1, 1)).toEqual(0);
     });
 
-    jasmine.env.xit('should gt int32_s', () => {
+    jasmine.env.it('should gt int32_s', () => {
         expect(interpreter.invoke('_i32gt_s', 2, 1)).toEqual(1);
         expect(interpreter.invoke('_i32gt_s', 1, 1)).toEqual(0);
     });
 
-    jasmine.env.xit('should gt int32_u', () => {
+    jasmine.env.it('should gt int32_u', () => {
         expect(interpreter.invoke('_i32gt_u', 2, 1)).toEqual(1);
         expect(interpreter.invoke('_i32gt_u', 1, 1)).toEqual(0);
     });
 
-    jasmine.env.xit('should le int32_s', () => {
+    jasmine.env.it('should le int32_s', () => {
         expect(interpreter.invoke('_i32le_s', 1, 2)).toEqual(1);
         expect(interpreter.invoke('_i32le_s', 1, 1)).toEqual(1);
         expect(interpreter.invoke('_i32le_s', 1, 0)).toEqual(0);
     });
 
-    jasmine.env.xit('should le int32_u', () => {
+    jasmine.env.it('should le int32_u', () => {
         expect(interpreter.invoke('_i32le_u', 1, 2)).toEqual(1);
         expect(interpreter.invoke('_i32le_u', 1, 1)).toEqual(1);
         expect(interpreter.invoke('_i32le_u', 1, 0)).toEqual(0);
     });
 
-    jasmine.env.xit('should ge int32_s', () => {
+    jasmine.env.it('should ge int32_s', () => {
         expect(interpreter.invoke('_i32ge_s', 2, 1)).toEqual(1);
         expect(interpreter.invoke('_i32ge_s', 1, 1)).toEqual(1);
         expect(interpreter.invoke('_i32ge_s', 0, 1)).toEqual(0);
     });
 
-    jasmine.env.xit('should ge int32_u', () => {
+    jasmine.env.it('should ge int32_u', () => {
         expect(interpreter.invoke('_i32ge_u', 2, 1)).toEqual(1);
         expect(interpreter.invoke('_i32ge_u', 1, 1)).toEqual(1);
         expect(interpreter.invoke('_i32ge_u', 0, 1)).toEqual(0);
