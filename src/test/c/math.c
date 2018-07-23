@@ -21,6 +21,14 @@ int strlen(const char *str) {
     return (s - str);
 }
 
+int stackTest(int sz) {
+    char str[sz];
+    for(int i = 0; i < sz; i++) {
+        str[i] = 0;
+    }
+    return sz;
+}
+
 int i32add(int a, int b) {
   return a + b;
 }

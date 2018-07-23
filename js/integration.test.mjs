@@ -44,6 +44,11 @@ jasmine.env.describe('WasmParser', () => {
         expect(str).toEqual("Hello, world!");
     });
 
+    jasmine.env.it('should allocate on stack', () => {
+        const res = interpreter.invoke('_stackTest', 10);
+        expect(res).toEqual(10);
+    });
+
     jasmine.env.it('should add int32s', () => {
         const result = interpreter.invoke('_i32add', 3, 5);
         expect(result).toEqual(8);

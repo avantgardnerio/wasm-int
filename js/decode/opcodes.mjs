@@ -50,7 +50,7 @@ export default {
     '0x37': notImplemented,
     '0x38': notImplemented,
     '0x39': notImplemented,
-    '0x3a': notImplemented,
+    '0x3a': r => ({op: 'i32.store8', flags: r.readVarUint(), offset: r.readVarUint()}),
     '0x3b': notImplemented,
     '0x3c': notImplemented,
     '0x3d': notImplemented,
