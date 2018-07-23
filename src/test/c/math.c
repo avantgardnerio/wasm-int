@@ -15,6 +15,21 @@ char *helloWorld() {
     return "Hello, world!";
 }
 
+int strlen(const char *str) {
+    const char *s;
+    for (s = str; *s; ++s);
+    return (s - str);
+}
+
+// http://lists.llvm.org/pipermail/llvm-dev/2017-July/115806.html
+int stackTest() {
+    int x[3];
+    x[0] = 2;
+    x[1] = 4;
+    x[2] = 6;
+    return x[1];
+}
+
 int i32add(int a, int b) {
   return a + b;
 }
