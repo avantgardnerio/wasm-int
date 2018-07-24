@@ -19,7 +19,12 @@ const denormalize = (module) => {
     if(bodies.length !== funcIdxs.length) throw new Error('Expected 1 body per function!');
 
     const importedFunctions = imports[0].imports
-        .filter(i => i.kind === 'Function');
+        .filter(i => i.kind === 'Function')
+        .map(f => ({
+            module: f.module,
+            name: f.field,
+            signature: types[0].functionSignatures[f.type]
+        }));
     const importedGlobals = imports[0].imports
         .filter(i => i.kind === 'Global');
     

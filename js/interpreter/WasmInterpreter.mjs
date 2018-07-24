@@ -21,8 +21,8 @@ const modules = {
        STACK_MAX: 5244960,
        exports: {
            functions: {
-               _llvm_stacksave: (t) => {
-                   console.log(t);
+               _llvm_stacksave: () => {
+                   throw new Error('TODO');
                }
            }
        }
@@ -153,13 +153,15 @@ export default class WasmInterpreter {
         if(funcIdx < this.module.imports.functions.length) {
             const funcImport = this.module.imports.functions[funcIdx];
             const module = modules[funcImport.module];
-            const importedFunc = module.exports.functions[funcImport.field];
+            const importedFunc = module.exports.functions[funcImport.name];
             if(typeof importedFunc === 'function') {
-
+                const args = funcImport.signature.parameterTypes.map(p => stack.pop());
+                const res = importedFunc(...args);
+                if(funcImport.signature.returnTypes.length > 1) throw new Error('Multiple returns not supported!');
+                if(funcImport.signature.returnTypes.length === 1) this.stack.push(res);
             } else {
-
+                throw new Error('TODO: call imported functions');
             }
-            throw new Error('TODO: call imported functions');
         }
         funcIdx -= this.module.imports.functions.length;
         const func = this.module.functions[funcIdx];
