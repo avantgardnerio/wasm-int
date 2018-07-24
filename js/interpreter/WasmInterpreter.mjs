@@ -21,9 +21,20 @@ const modules = {
        STACK_MAX: 5244960,
        exports: {
            functions: {
-               _llvm_stacksave: () => {
-                   throw new Error('TODO');
-               }
+               // https://llvm.org/docs/LangRef.html#llvm-stacksave-intrinsic
+               _llvm_stacksave: function() {
+                   this.savedStacks.push({
+                       dataStack: [...this.dataStack],
+                       callStack: [...this.callStack]
+                   });
+                   return this.savedStacks.length - 1;
+               },
+               _llvm_stackrestore: function(idx) {
+                   const stacks = this.savedStacks[idx];
+                   this.savedStacks.splice(idx, 1);
+                   this.dataStack = stacks.dataStack;
+                   this.callStack = stacks.callStack;
+               },
            }
        }
    }
@@ -34,8 +45,9 @@ export default class WasmInterpreter {
         this.module = module;
         if(TextDecoder) this.textDecoder = new TextDecoder('utf-8');
 
-        this.stack = [];
+        this.dataStack = [];
         this.callStack = [];
+        this.savedStacks = [];
         this.globals = new Array(module.imports.globals.length + module.globals.length);
 
         // globals
@@ -135,13 +147,13 @@ export default class WasmInterpreter {
                     if (!inst) throw new Error('Unknown opcode: ' + this.currentInst.op);
                     //console.log('execute ', op.op);
                     try {
-                        inst(this.currentInst, this.stack, this.locals, this.globals, this.memView);
+                        inst(this.currentInst, this.dataStack, this.locals, this.globals, this.memView);
                     } catch(ex) {
                         throw new Error('Error running op: ' + this.currentInst.op, ex);
                     }
             }
             if(this.callStack.length === 0) {
-                return this.stack.pop();
+                return this.dataStack.pop();
             }
             this.stackFrame.ip++;
         }
@@ -155,20 +167,21 @@ export default class WasmInterpreter {
             const module = modules[funcImport.module];
             const importedFunc = module.exports.functions[funcImport.name];
             if(typeof importedFunc === 'function') {
-                const args = funcImport.signature.parameterTypes.map(p => stack.pop());
-                const res = importedFunc(...args);
+                const args = funcImport.signature.parameterTypes.map(p => this.dataStack.pop());
+                const res = importedFunc.apply(this, args);
                 if(funcImport.signature.returnTypes.length > 1) throw new Error('Multiple returns not supported!');
-                if(funcImport.signature.returnTypes.length === 1) this.stack.push(res);
+                if(funcImport.signature.returnTypes.length === 1) this.dataStack.push(res);
             } else {
                 throw new Error('TODO: call imported functions');
             }
+        } else {
+            funcIdx -= this.module.imports.functions.length;
+            const func = this.module.functions[funcIdx];
+            const args = func.signature.parameterTypes.map(t => this.dataStack.pop()); // TODO: verfify param order on stack
+            const locals = [...args, ...func.body.localVariables.map(v => defaults[v])];
+            console.log(`calling ${func.name} with args: `, args);
+            this.callStack.push({ inst: func.body.code, ip: 0, locals, type: 'call' });
         }
-        funcIdx -= this.module.imports.functions.length;
-        const func = this.module.functions[funcIdx];
-        const args = func.signature.parameterTypes.map(t => this.stack.pop()); // TODO: verfify param order on stack
-        const locals = [...args, ...func.body.localVariables.map(v => defaults[v])];
-        console.log(`calling ${func.name} with args: `, args);
-        this.callStack.push({ inst: func.body.code, ip: 0, locals, type: 'call' });
     }
 
     return() {
@@ -180,7 +193,7 @@ export default class WasmInterpreter {
     }
 
     if() {
-        const conditionExprRes = this.stack.pop();
+        const conditionExprRes = this.dataStack.pop();
         if(conditionExprRes === 1) {
             console.log('recurse into true clause of if');
             this.callStack.push({inst: this.currentInst.true, ip: -1, locals: this.locals, type: 'if'});
