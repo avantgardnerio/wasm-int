@@ -55,6 +55,11 @@ jasmine.env.describe('WasmParser', () => {
         expect(res).toEqual(4);
     });
 
+    jasmine.env.it('should implement _llvm_stacksave and _llvm_stackrestore', () => {
+        const res = interpreter.invoke('_stackSaveTest', 3);
+        expect(res).toEqual(42);
+    });
+
     jasmine.env.it('should add int32s', () => {
         const result = interpreter.invoke('_i32add', 3, 5);
         expect(result).toEqual(8);

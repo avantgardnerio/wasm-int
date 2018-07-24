@@ -35,7 +35,7 @@ export default class ImportSection extends Section {
                 type = this.parseGlobalType();
                 return { module, field, kind, type: type.type, mutable: type.mutable };
             case 'Function':
-                // the index of the funciton signature
+                // the index of the function signature
                 type = this.reader.readVarUint();
                 break;
             default:

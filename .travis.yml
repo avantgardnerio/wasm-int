@@ -8,13 +8,13 @@ before_install:
   - rm -rf emsdk
   - git clone https://github.com/juj/emsdk.git
   - cd emsdk 
-  - ./emsdk install latest
-  - ./emsdk activate latest
+  - ./emsdk install sdk-1.38.8-64bit
+  - ./emsdk activate sdk-1.38.8-64bit
   - export PATH=$PATH:$TRAVIS_BUILD_DIR/emsdk
   - export PATH=$PATH:$TRAVIS_BUILD_DIR/emsdk/clang/e1.38.9_64bit
-  - export PATH=$PATH:$TRAVIS_BUILD_DIR/emsdk/emscripten/1.38.9
+  - export PATH=$PATH:$TRAVIS_BUILD_DIR/emsdk/emscripten/1.38.8
   - export EMSDK=$TRAVIS_BUILD_DIR/emsdk
   - export EM_CONFIG=/home/travis/.emscripten
   - export BINARYEN_ROOT=$TRAVIS_BUILD_DIR/emsdk/clang/e1.38.9_64bit/binaryen
-  - export EMSCRIPTEN=$TRAVIS_BUILD_DIR/emsdk/emscripten/1.38.9
+  - export EMSCRIPTEN=$TRAVIS_BUILD_DIR/emsdk/emscripten/1.38.8
   - cd ..

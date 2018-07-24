@@ -30,6 +30,12 @@ int stackTest() {
     return x[1];
 }
 
+int stackSaveTest(sz) {
+    int x = 42;
+    int dyn[sz];
+    return 42;
+}
+
 int i32add(int a, int b) {
   return a + b;
 }
