@@ -78,6 +78,10 @@ int i32shr_s(int a, int b) {
     return a >> b;
 }
 
+unsigned int i32shr_u(unsigned int a, unsigned int b) {
+    return a >> b;
+}
+
 unsigned int i32lt_u(unsigned int a, unsigned int b) {
   return a < b;
 }
