@@ -11,11 +11,6 @@ int fib(int n) {
    return fib(n-1) + fib(n-2);
 }
 
-int dropTest(int val) {
-    fib(val);
-    return val;
-}
-
 char *helloWorld() {
     return "Hello, world!";
 }
@@ -37,6 +32,11 @@ int stackSaveTest(sz) {
 
 int i32add(int a, int b) {
   return a + b;
+}
+
+int dropTest(int val) {
+    i32add(val, val);
+    return val;
 }
 
 int i32sub(int a, int b) {

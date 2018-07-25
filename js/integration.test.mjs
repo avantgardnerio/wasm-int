@@ -39,6 +39,11 @@ jasmine.env.describe('WasmParser', () => {
         expect(result).toEqual(27);
     });
 
+    jasmine.env.it('should drop', () => {
+        const result = interpreter.invoke('_dropTest', 42);
+        expect(result).toEqual(42);
+    });
+
     jasmine.env.it('should handle recursive function calls', () => {
         const result = interpreter.invoke('_fib', 6);
         expect(result).toEqual(8);

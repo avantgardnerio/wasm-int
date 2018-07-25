@@ -26,7 +26,7 @@ export default {
     'call_indirect': notImplemented,
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#parametric-operators-described-here
-    'drop': notImplemented,
+    'drop': (i, s, l, g) => s.pop(),
     'select': notImplemented,
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#variable-access-described-here

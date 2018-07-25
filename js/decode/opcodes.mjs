@@ -21,7 +21,7 @@ export default {
     '0x11': notImplemented,
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#parametric-operators-described-here
-    '0x1a': notImplemented,
+    '0x1a': r => ({op: 'drop'}),
     '0x1b': notImplemented,
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#variable-access-described-here
