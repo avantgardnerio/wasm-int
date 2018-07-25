@@ -35,7 +35,7 @@ jasmine.env.describe('WasmParser', () => {
     });
 
     jasmine.env.it('should loop and break', () => {
-        const result = interpreter.invoke('_pow', 3, 3);
+        const result = interpreter.invoke('_fpow', 3, 3);
         expect(result).toEqual(27);
     });
 
@@ -98,6 +98,11 @@ jasmine.env.describe('WasmParser', () => {
     jasmine.env.it('should shift left int32', () => {
         const result = interpreter.invoke('_i32shl', 1, 2);
         expect(result).toEqual(4);
+    });
+
+    jasmine.env.it('should shift right int32', () => {
+        const result = interpreter.invoke('_i32shr_s', 4, 2);
+        expect(result).toEqual(1);
     });
 
     jasmine.env.it('should eq int32', () => {
