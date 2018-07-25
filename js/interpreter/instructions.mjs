@@ -159,7 +159,7 @@ export default {
     'i32.xor': (i, s, l, g) => s.push(s.pop() ^ s.pop()),
     'i32.shl': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a << b) },
     'i32.shr_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a >> b) },
-    'i32.shr_u': notImplemented,
+    'i32.shr_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a >> b) },
     'i32.rotl': notImplemented,
     'i32.rotr': notImplemented,
 
