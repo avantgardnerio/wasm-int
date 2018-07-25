@@ -1,4 +1,4 @@
-int pow(int x, int y) {
+int fpow(int x, int y) {
     int z = 1;
     for(int i = 0; i < y; i++) {
         z *= x;
@@ -13,12 +13,6 @@ int fib(int n) {
 
 char *helloWorld() {
     return "Hello, world!";
-}
-
-int strlen(const char *str) {
-    const char *s;
-    for (s = str; *s; ++s);
-    return (s - str);
 }
 
 // http://lists.llvm.org/pipermail/llvm-dev/2017-July/115806.html
@@ -78,6 +72,14 @@ int i32ne(unsigned int a, unsigned int b) {
 
 int i32lt_s(int a, int b) {
   return a < b;
+}
+
+int i32shr_s(int a, int b) {
+    return a >> b;
+}
+
+unsigned int i32shr_u(unsigned int a, unsigned int b) {
+    return a >> b;
 }
 
 unsigned int i32lt_u(unsigned int a, unsigned int b) {

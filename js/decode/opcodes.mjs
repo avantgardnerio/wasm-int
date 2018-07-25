@@ -116,7 +116,7 @@ export default {
     '0x73': r => ({op: 'i32.xor'}),
     '0x74': r => ({op: 'i32.shl'}),
     '0x75': r => ({op: 'i32.shr_s'}),
-    '0x76': notImplemented,
+    '0x76': r => ({op: 'i32.shr_u'}),
     '0x77': notImplemented,
     '0x78': notImplemented,
     '0x79': notImplemented,
