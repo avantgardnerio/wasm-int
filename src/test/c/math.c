@@ -11,6 +11,11 @@ int fib(int n) {
    return fib(n-1) + fib(n-2);
 }
 
+int dropTest(int val) {
+    fib(val);
+    return val;
+}
+
 char *helloWorld() {
     return "Hello, world!";
 }
