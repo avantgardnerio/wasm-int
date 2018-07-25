@@ -34,6 +34,11 @@ int i32add(int a, int b) {
   return a + b;
 }
 
+int dropTest(int val) {
+    i32add(val, val);
+    return val;
+}
+
 int i32sub(int a, int b) {
   return a - b;
 }
