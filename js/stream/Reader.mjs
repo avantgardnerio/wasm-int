@@ -74,10 +74,12 @@ export default class Reader {
         }
         if (idx === 4) {
             acc[1] |= (bits & 0x7) << (idx * 7);
-            if(bits & 0x8) acc[1] += 0x80000000;
-            acc[0] |= (bits >> 4) << ((idx - 5) * 7);
+            if (bits & 0x8) acc[1] += 0x80000000;
+            acc[0] |= (bits >> 4);
         }
-        if(idx > 4) throw new Error('TODO!');
+        if (idx > 4) {
+            acc[0] |= bits << ((idx - 5) * 7 + 4);
+        }
         if (more === false) {
             const negative = !!(byte & 0x40);
             if (negative) throw new Error('TODO!');
