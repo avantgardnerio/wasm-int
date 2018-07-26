@@ -63,6 +63,10 @@ export default class Reader {
         return val;
     }
 
+    readVarInt64() {
+        throw new Error('TODO');
+    }
+
     readString(len) {
         const bytes = this.readBytes(len);
         const str = this.textDecoder.decode(bytes);
