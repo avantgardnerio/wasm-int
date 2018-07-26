@@ -30,4 +30,11 @@ jasmine.env.describe('Reader', () => {
         const res = reader.readVarInt64();
         expect(res).toEqual([0x00, 0x01]);
     });
+
+    jasmine.env.it('should read 2nd 64 bit byte', () => {
+        const ar = new Uint8Array([0x80, 0x01]);
+        const reader = new Reader(ar.buffer);
+        const res = reader.readVarInt64();
+        expect(res).toEqual([0x00, 0x80]);
+    });
 });
