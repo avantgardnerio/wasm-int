@@ -24,6 +24,10 @@ int stackTest() {
     return x[1];
 }
 
+unsigned long long int longTest() {
+    return 0ull;
+}
+
 int stackSaveTest(sz) {
     int x = 42;
     int dyn[sz];
