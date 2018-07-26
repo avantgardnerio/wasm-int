@@ -31,10 +31,10 @@ jasmine.env.describe('Reader', () => {
         expect(res).toEqual([0x00, 0x01]);
     });
 
-    jasmine.env.it('should read 2nd 64 bit byte', () => {
-        const ar = new Uint8Array([0x80, 0x01]);
+    jasmine.env.it('should read highest-order bit on least significant word', () => {
+        const ar = new Uint8Array([0x80, 0x80, 0x80, 0x80, 0x08]);
         const reader = new Reader(ar.buffer);
         const res = reader.readVarInt64();
-        expect(res).toEqual([0x00, 0x80]);
+        expect(res).toEqual([0x00, 0x80000000]);
     });
 });

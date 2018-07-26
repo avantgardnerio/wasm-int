@@ -67,11 +67,19 @@ export default class Reader {
     readVarInt64(acc = [0x00, 0x00], idx = 0) {
         const byte = this.dataView.getUint8(this.offset + idx);
         const more = !!(byte & 0x80);
+        const significant = more ? 0x7F : 0x3F;
+        const bits = byte & significant;
+        if (idx < 4) {
+            acc[1] |= bits << (idx * 7);
+        }
+        if (idx === 4) {
+            acc[1] |= (bits & 0x7) << (idx * 7);
+            if(bits & 0x8) acc[1] += 0x80000000;
+            acc[0] |= (bits >> 4) << ((idx - 5) * 7);
+        }
+        if(idx > 4) throw new Error('TODO!');
         if (more === false) {
             const negative = !!(byte & 0x40);
-            const bits = byte & 0x3F;
-            if ((idx + 1) * 7 > 32) throw new Error('TODO!');
-            acc[1] |= bits << (idx * 7);
             if (negative) throw new Error('TODO!');
             return acc;
         }
