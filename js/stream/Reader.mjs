@@ -70,7 +70,7 @@ export default class Reader {
         if(more === false) {
             return acc;
         }
-        this.readVarInt64(acc, idx + 1);
+        return this.readVarInt64(acc, idx + 1);
     }
 
     readString(len) {
