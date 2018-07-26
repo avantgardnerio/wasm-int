@@ -14,6 +14,6 @@ jasmine.env.describe('Reader', () => {
         const ar = new Uint8Array([0x00]);
         const reader = new Reader(ar.buffer);
         const res = reader.readVarInt64();
-        expect(res).toEqual({hi: 0x00, lo: 0x00});
+        expect(res).toEqual([0x00, 0x00]);
     });
 });

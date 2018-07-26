@@ -2,7 +2,7 @@ export default class Reader {
     constructor(buffer, TextDecoder) {
         this.buffer = buffer;
         this.dataView = new DataView(buffer);
-        if(TextDecoder) this.textDecoder = new TextDecoder('utf-8');
+        if (TextDecoder) this.textDecoder = new TextDecoder('utf-8');
         this.offset = 0;
     }
 
@@ -34,13 +34,14 @@ export default class Reader {
     128  64  32  16   8   4   2   1 (decimal value)
     8    7   6   5    4   3   2   1 (bit position)
     */
+
     // https://en.wikipedia.org/wiki/LEB128
     readVarUint() {
         let [val, count, byte] = [0, 0, 0];
         do {
             byte = this.dataView.getUint8(this.offset + count);
             val |= (byte & 0x7F) << (count++ * 7);
-        } while(byte & 0x80);
+        } while (byte & 0x80);
         this.offset += count;
         return parseInt(val);
     }
@@ -52,19 +53,24 @@ export default class Reader {
             const lastByte = !(byte & 0x80);
             const negative = lastByte && !!(byte & 0x40);
             const significant = lastByte ? 0x3F : 0x7F;
-            mask |= (0xFF & significant) << (count * 7); 
+            mask |= (0xFF & significant) << (count * 7);
             val |= (byte & significant) << (count * 7);
-            if(negative) {
+            if (negative) {
                 val = (((val ^ mask) & mask) + 1) * -1;
             }
             count++;
-        } while(byte & 0x80);
+        } while (byte & 0x80);
         this.offset += count;
         return val;
     }
 
-    readVarInt64() {
-        throw new Error('TODO');
+    readVarInt64(acc = [0x00, 0x00], idx = 0) {
+        const byte = this.dataView.getUint8(this.offset + idx);
+        const more = !!(byte & 0x80);
+        if(more === false) {
+            return acc;
+        }
+        this.readVarInt64(acc, idx + 1);
     }
 
     readString(len) {
