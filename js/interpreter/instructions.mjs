@@ -1,4 +1,6 @@
-const notImplemented = () => { throw new Error('Not implemented') };
+const notImplemented = () => {
+    throw new Error('Not implemented')
+};
 
 /*
     i = instruction,
@@ -51,7 +53,7 @@ export default {
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#memory-related-operators-described-here
     'i32.load': (i, s, l, g, m) => {
         const ptr = s.pop() + i.offset; // TODO: align to i.flags
-        const val =  m.getInt32(ptr);
+        const val = m.getInt32(ptr);
         console.log(`i32.load ${val} == mem[${ptr}]`);
         s.push(val);
     },
@@ -87,7 +89,7 @@ export default {
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#constants-described-here
     'i32.const': (i, s, l, g) => s.push(i.value),
-    'i64.const': notImplemented,
+    'i64.const': (i, s, l, g) => s.push(i.value),
     'f32.const': (i, s, l, g) => s.push(i.value),
     'f64.const': notImplemented,
 
@@ -104,13 +106,34 @@ export default {
         console.log('int32.lt_s', a, b, a < b ? 1 : 0);
         s.push(a < b ? 1 : 0)
     },
-    'i32.lt_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a < b ? 1 : 0) },
-    'i32.gt_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a > b ? 1 : 0) },
-    'i32.gt_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a > b ? 1 : 0) },
-    'i32.le_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a <= b ? 1 : 0) },
-    'i32.le_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a <= b ? 1 : 0) },
-    'i32.ge_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a >= b ? 1 : 0) },
-    'i32.ge_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a >= b ? 1 : 0) },
+    'i32.lt_u': (i, s, l, g) => {
+        const [b, a] = [s.pop(), s.pop()];
+        s.push(a < b ? 1 : 0)
+    },
+    'i32.gt_s': (i, s, l, g) => {
+        const [b, a] = [s.pop(), s.pop()];
+        s.push(a > b ? 1 : 0)
+    },
+    'i32.gt_u': (i, s, l, g) => {
+        const [b, a] = [s.pop(), s.pop()];
+        s.push(a > b ? 1 : 0)
+    },
+    'i32.le_s': (i, s, l, g) => {
+        const [b, a] = [s.pop(), s.pop()];
+        s.push(a <= b ? 1 : 0)
+    },
+    'i32.le_u': (i, s, l, g) => {
+        const [b, a] = [s.pop(), s.pop()];
+        s.push(a <= b ? 1 : 0)
+    },
+    'i32.ge_s': (i, s, l, g) => {
+        const [b, a] = [s.pop(), s.pop()];
+        s.push(a >= b ? 1 : 0)
+    },
+    'i32.ge_u': (i, s, l, g) => {
+        const [b, a] = [s.pop(), s.pop()];
+        s.push(a >= b ? 1 : 0)
+    },
 
     'i64.eqz': notImplemented,
     'i64.eq': notImplemented,
@@ -143,23 +166,41 @@ export default {
     'i32.ctz': notImplemented,
     'i32.popcnt': notImplemented,
     'i32.add': (i, s, l, g) => s.push(s.pop() + s.pop()),
-    'i32.sub': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a - b) },
+    'i32.sub': (i, s, l, g) => {
+        const [b, a] = [s.pop(), s.pop()];
+        s.push(a - b)
+    },
     'i32.mul': (i, s, l, g) => {
         const [b, a] = [s.pop(), s.pop()];
         const c = a * b;
         console.log(`i32.mul ${c}=${a}*${b}`);
         s.push(c);
     },
-    'i32.div_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a / b) },
-    'i32.div_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a / b) },
+    'i32.div_s': (i, s, l, g) => {
+        const [b, a] = [s.pop(), s.pop()];
+        s.push(a / b)
+    },
+    'i32.div_u': (i, s, l, g) => {
+        const [b, a] = [s.pop(), s.pop()];
+        s.push(a / b)
+    },
     'i32.rem_s': notImplemented,
     'i32.rem_u': notImplemented,
     'i32.and': (i, s, l, g) => s.push(s.pop() & s.pop()),
     'i32.or': (i, s, l, g) => s.push(s.pop() | s.pop()),
     'i32.xor': (i, s, l, g) => s.push(s.pop() ^ s.pop()),
-    'i32.shl': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a << b) },
-    'i32.shr_s': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a >> b) },
-    'i32.shr_u': (i, s, l, g) => { const [b, a] = [s.pop(), s.pop()]; s.push(a >> b) },
+    'i32.shl': (i, s, l, g) => {
+        const [b, a] = [s.pop(), s.pop()];
+        s.push(a << b)
+    },
+    'i32.shr_s': (i, s, l, g) => {
+        const [b, a] = [s.pop(), s.pop()];
+        s.push(a >> b)
+    },
+    'i32.shr_u': (i, s, l, g) => {
+        const [b, a] = [s.pop(), s.pop()];
+        s.push(a >> b)
+    },
     'i32.rotl': notImplemented,
     'i32.rotr': notImplemented,
 
@@ -178,7 +219,14 @@ export default {
     'i64.xor': notImplemented,
     'i64.shl': notImplemented,
     'i64.shr_s': notImplemented,
-    'i64.shr_u': notImplemented,
+    'i64.shr_u': (i, s, l, g) => {
+        const [b, a] = [s.pop(), s.pop()];
+        if (b[0] === 0 && b[1] === 32) {
+            s.push([0, a[0]]);
+        } else {
+            throw new Error('TODO');
+        }
+    },
     'i64.rotl': notImplemented,
     'i64.rotr': notImplemented,
 
@@ -213,7 +261,7 @@ export default {
     'f64.copysign': notImplemented,
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#conversions-described-here
-    'i32.wrap/i64': notImplemented,
+    'i32.wrap/i64': (i, s, l, g) => s.push(s.pop()[1]),
     'i32.trunc_s/f32': notImplemented,
     'i32.trunc_u/f32': notImplemented,
     'i32.trunc_s/f64': notImplemented,
