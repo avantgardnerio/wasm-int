@@ -7,7 +7,7 @@ import { execSync } from 'child_process';
 import WasmParser from './parser/WasmParser.mjs';
 import WasmInterpreter from './interpreter/WasmInterpreter.mjs';
 
-jasmine.env.describe('WasmParser', () => {
+jasmine.env.xdescribe('WasmParser', () => {
     let interpreter;
 
     jasmine.env.beforeAll(() => {

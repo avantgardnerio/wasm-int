@@ -60,7 +60,7 @@ export default {
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#constants-described-here
     '0x41': r => ({op: 'i32.const', value: r.readVarInt()}),
-    '0x42': notImplemented,
+    '0x42': r => ({op: 'i64.const', value: r.readVarInt64()}),
     '0x43': r => ({op: 'f32.const', value: r.getFloat32()}),
     '0x44': r => ({op: 'f64.const', value: r.getFloat64()}),
 
