@@ -134,7 +134,7 @@ export default {
     '0x85': notImplemented,
     '0x86': notImplemented,
     '0x87': notImplemented,
-    '0x88': notImplemented,
+    '0x88': r => ({op: 'i64.shr_u'}),
     '0x89': notImplemented,
     '0x8a': notImplemented,
     '0x8b': notImplemented,
@@ -167,7 +167,7 @@ export default {
     '0xa6': notImplemented,
 
     // https://github.com/WebAssembly/design/blob/master/BinaryEncoding.md#conversions-described-here
-    '0xa7': notImplemented,
+    '0xa7': r => ({op: 'i32.wrap/i64'}),
     '0xa8': notImplemented,
     '0xa9': notImplemented,
     '0xaa': notImplemented,

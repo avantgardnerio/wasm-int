@@ -81,6 +81,7 @@ export default class Reader {
             acc[0] |= bits << ((idx - 5) * 7 + 4);
         }
         if (more === false) {
+            this.offset += idx + 1;
             const negative = !!(byte & 0x40);
             if (negative) throw new Error('TODO!');
             return acc;
