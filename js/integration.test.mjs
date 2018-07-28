@@ -7,7 +7,7 @@ import { execSync } from 'child_process';
 import WasmParser from './parser/WasmParser.mjs';
 import WasmInterpreter from './interpreter/WasmInterpreter.mjs';
 
-jasmine.env.xdescribe('WasmParser', () => {
+jasmine.env.describe('WasmParser', () => {
     let interpreter;
 
     jasmine.env.beforeAll(() => {
@@ -68,6 +68,11 @@ jasmine.env.xdescribe('WasmParser', () => {
     jasmine.env.it('should add int32s', () => {
         const result = interpreter.invoke('_i32add', 3, 5);
         expect(result).toEqual(8);
+    });
+
+    jasmine.env.it('should return int64 const', () => {
+        const result = interpreter.invoke('_longTest');
+        expect(result).toEqual(42);
     });
 
     jasmine.env.it('should subtract int32s', () => {

@@ -25,7 +25,7 @@ int stackTest() {
 }
 
 unsigned long long int longTest() {
-    return 0ull;
+    return 42ull;
 }
 
 int stackSaveTest(sz) {
